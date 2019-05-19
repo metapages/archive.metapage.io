@@ -12,11 +12,25 @@ const getLayout = (metapageDefinition, layoutName) => {
 /**
  * If there is no layout, just dump the metaframes
  * in a simple grid, without caring about the order
+ * "layouts": {
+      "flexboxgrid" : {
+        "version": 1,
+        "docs": "http://flexboxgrid.com/",
+        "layout": [
+          [ {"name":"input-button", "width":"col-xs-4", "style": {"maxHeight":"400px"}}, {"url":"http://localhost:4000/metaframes/passthrough-arrow/?rotation=90", "width":"col-xs-2"}, {"name":"viewer1", "width":"col-xs-6"} ],
+          [ {"name":"passthrough2", "width":"col-xs-6"}, {"name":"passthrough1", "width":"col-xs-6", "style": {"maxHeight":"100px"}} ],
+          [ {"name":"viewer2", "width":"col-xs-6", "style": {"maxHeight":"400px"}} , {"name":"viewer3", "width":"col-xs-6"} ]
+        ],
+        "options": {
+          "arrows": true
+        }
+      }
+    }
  */
-const generateDefaultLayout = (metapage, name) => {
+const generateDefaultLayout = (metapage) => {
 	const metaframes = metapage.metaframes();
 	const metaframeIds = Object.keys(metaframes);
-	columns = columns ? columns : 2;
+	let columns = 2;
 	if (metaframeIds.length < 2) {
 		columns = 1;
 	}
@@ -33,10 +47,10 @@ const generateDefaultLayout = (metapage, name) => {
 		if (!result[rowIndex]) {
 			result[rowIndex] = [];
 		}
-		result[rowIndex].push({name:metaframeIds.pop()});
+		result[rowIndex].push({name:metaframeIds.pop(), width:'col-xs', style:{}});
 		colIndex++;
 	}
-	return result;
+	return {layout:{layout:result}, layoutName:'flexboxgrid'};
 }
 
 // const getCssNumber = (val, defaultVal) => {
@@ -150,9 +164,8 @@ const applyLayout = (name, layout, metapage) => {
 					{rowElements}
 				</div>;
 			});
-		break;
-			default:
-				throw `Unknown layout: ${name}`;
+		default:
+			throw `Unknown layout: ${name}`;
 	}
 }
 
@@ -167,11 +180,11 @@ export default class ViewMetapage extends Component {
 		if (!metapage) {
 			return null;
 		}
-		const layoutName = 'flexboxgrid';
-		var layout = getLayout(definition, layoutName);
+		let layoutName = 'flexboxgrid';
+		let layout = getLayout(definition, layoutName);
 		if (!layout) {
 			console.log(`no layout, generating default layout="${layoutName}"`);
-			layout = generateDefaultLayout(metapage, layoutName)
+			({layoutName, layout} = generateDefaultLayout(metapage));
 		}
 
 		var metaframesArranged = applyLayout(layoutName, layout, metapage)

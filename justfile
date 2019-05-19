@@ -31,6 +31,9 @@ watch:
 deploy:
 	npm run deploy
 
+# CLI shell in the docker container
+docker-cli:
+	just _get-in-docker
 
 _get-in-docker:
 	docker-compose run --rm -p '4010:{{PORT}}' metapage-app /bin/sh
