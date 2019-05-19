@@ -3,8 +3,8 @@ import { h, Component } from 'preact';
 export default class HelpCard extends Component {
 	render(props) {
         const examples = [
-            'http://localhost:4000/metapages/dynamic-plot/metapage.json',
-            'http://localhost:4000/metapages/linked-molecule-viewers/metapage.json',
+            'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
+            'https://metapages.org/metapages/dynamic-plot/metapage.json',
         ].map((exampleUrl) => <div class="siimple-btn" onClick={() => {props.setUrl(exampleUrl)}} >{exampleUrl}</div>);
 		return (
             <div class="siimple-card" style="max-width:600px">

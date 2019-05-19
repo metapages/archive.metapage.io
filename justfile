@@ -1,17 +1,19 @@
 # https://github.com/casey/just
 
-# just runs the dev server by default
-PROJECT_NAME := `basename $PWD`
 NODE_ENV := 'development'
-FINAL_BUILD_TARGET := "../../docs/_metapages/metapage-app/"
 PORT := env_var_or_default("PORT", "4010")
 
+# If we're not running in a docker container
 _first:
-	@if [ -f /.dockerenv ]; then \
-		just --list; \
-	else \
-		just _get-in-docker; \
-	fi
+	just --list
+	# Disabled this for now. Experimenting with automatically
+	# putting the CLI user in a docker shell context to ensure
+	# all tools are available.
+	# @if [ -f /.dockerenv ]; then \
+	# 	just --list; \
+	# else \
+	# 	just _get-in-docker; \
+	# fi
 
 # serve and build on [src] change
 serve:
@@ -20,7 +22,6 @@ serve:
 # build artifact to {{FINAL_BUILD_TARGET}}
 build:
     npm run build
-    @# rsync -arv --delete build/ {{FINAL_BUILD_TARGET}}
 
 # [src] change -> build artifact to {{FINAL_BUILD_TARGET}}
 watch:
