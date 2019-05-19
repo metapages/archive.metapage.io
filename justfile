@@ -29,6 +29,7 @@ watch:
 
 # deploy to gh-pages branch
 deploy:
+	npm run pre-deploy 
 	npm run deploy
 
 # CLI shell in the docker container
