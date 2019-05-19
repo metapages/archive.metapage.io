@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "pre-deploy": "npm run build",
-    "deploy": "hg-pages -d build",
+    "deploy": "gh-pages -d build",
     "start": "per-env",
     "start:production": "npm run -s serve",
     "start:development": "npm run -s dev",
