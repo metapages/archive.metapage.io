@@ -1,0 +1,8 @@
+.DS_Store
+.haxelib
+.git
+node_modules/
+tmp/
+metapage.sublime**
+README.md
+libs

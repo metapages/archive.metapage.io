@@ -1,0 +1,19 @@
+*.map
+*.pyc
+node_modules
+*.sublime-workspace
+tmp
+npm-debug.log
+.haxelib
+.bundle
+.idea
+.aws
+.env
+gitcache
+_site
+.sass-cache
+build
+
+# Normally .npmrc files are tracked, but we're only using ours
+# to store the token for CI
+.npmrc

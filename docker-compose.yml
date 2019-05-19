@@ -1,0 +1,26 @@
+version: '2.3'
+
+networks:
+  bridge:
+    driver: bridge
+
+services:
+
+  metapage-app:
+    build:
+      context: .
+    command: ["just", "get-in-docker"]
+    environment:
+      - "HIST_FILE=/root/.bash_history"
+    volumes:
+      - ./:/workspace
+      - ${HOME}:${HOME}
+      - ${HOME}/.bash_history:/root/.bash_history
+      - ${HOME}/.aliases:/root/.aliases
+    networks:
+      - bridge
+    ports:
+      - "4010:${PORT_METAPAGE_APP:-4010}"
+
+
+  

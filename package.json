@@ -1,0 +1,43 @@
+{
+  "private": false,
+  "name": "metapage-app",
+  "version": "0.0.1",
+  "homepage": "https://metapages.github.io/metapage-app/",
+  "license": "MIT",
+  "scripts": {
+    "pre-deploy": "npm run build",
+    "deploy": "hg-pages -d build",
+    "start": "per-env",
+    "start:production": "npm run -s serve",
+    "start:development": "npm run -s dev",
+    "build": "preact build",
+    "serve": "preact build && preact serve --port 4010",
+    "dev": "preact watch --port 4010",
+    "lint": "eslint src",
+    "test": "jest"
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-synacor"
+  },
+  "eslintIgnore": [
+    "build/*"
+  ],
+  "devDependencies": {
+    "eslint": "^4.9.0",
+    "eslint-config-synacor": "^2.0.2",
+    "identity-obj-proxy": "^3.0.0",
+    "per-env": "^1.0.2",
+    "preact-cli": "^2.1.0",
+    "preact-cli-plugin-async": "^2.0.0",
+    "preact-render-spy": "^1.2.1"
+  },
+  "dependencies": {
+    "flexboxgrid": "^6.3.1",
+    "gh-pages": "^2.0.1",
+    "metaframe": "^0.2.0",
+    "metapage": "^0.2.0",
+    "preact": "^8.2.6",
+    "preact-compat": "^3.17.0",
+    "siimple": "^3.3.1"
+  }
+}
