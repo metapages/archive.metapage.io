@@ -2,7 +2,7 @@
   "private": false,
   "name": "metapage-app",
   "version": "0.0.1",
-  "homepage": "https://metapages.github.io/",
+  "homepage": "https://app.metapages.org/",
   "license": "MIT",
   "scripts": {
     "pre-deploy": "npm run build",
