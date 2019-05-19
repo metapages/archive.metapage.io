@@ -15,17 +15,17 @@ const Status = Object.freeze(['loading', 'loaded', 'empty'].reduce((obj, current
 export default class MetapageApp extends Component {
 	
 	state = {
-		alert             : null, // {level,message}
+		alert             : null,   // {level,message}
 		metapage          : null,
 		metapageDefinition: null,
-		queueLoad         : true,
-		status            : null, //Status.loading,
+		params            : {},    // from the URL hash string
+		status            : null,   //Status.loading,
 		url               : null,
 	};
 
 	componentDidMount() {
 		window.onhashchange = this.onHashChange;
-		this.load();
+		this.onHashChange();
 	}
 
 	componentWillUnmount() {
@@ -37,17 +37,6 @@ export default class MetapageApp extends Component {
 	}
 
 	load = async () => {
-		if (this.state.status == Status.loading) {
-			this.setState({
-				queueLoad: true,
-			});
-			return;
-		}
-		const maybeReload = () => {
-			// if (this.state.queueLoad) {
-			// 	setTimeout(this.load, 0);
-			// }
-		}
 		if (this.state.metapage) {
 			this.state.metapage.dispose();
 		}
@@ -57,15 +46,14 @@ export default class MetapageApp extends Component {
 			metapageDefinition: null,
 			status            : Status.loading,
 		});
-		const hashParams = this.getHashParameters();
-		if (hashParams == null) {
+		
+		if (Object.keys(this.state.params).length == 0) {
 			// This will show the help
 			this.setState({status:Status.empty});
-			maybeReload();
 			return;
 		}
 		try {
-			const loadState = await this.getMetapageDefinitionFromParams(hashParams);
+			const loadState = await this.getMetapageDefinitionFromParams(this.state.params);
 			this.setState(loadState);
 
 			const metapageDefinition = loadState.metapageDefinition;
@@ -87,19 +75,18 @@ export default class MetapageApp extends Component {
 			this.setState({
 				status: Status.loaded,
 			});
-			maybeReload();
 			
 		} catch(err) {
 			this.setState({
 				alert : {level: 'error', message: err},
 				status: Status.loaded,
 			});
-			maybeReload();
 		}
 	}
 
 	onHashChange = () => {
 		// console.log('onhashchanage', window.location.hash);
+		this.setState({params: this.getHashParameters()});
 		this.load();
 	}
 
@@ -156,7 +143,6 @@ export default class MetapageApp extends Component {
 
 	setUrl = (url) => {
 		this.setHashParameter('url', url);
-		// this.load();
 	}
 
 	getMetapageDefinitionFromParams = async (hashParams) => {
@@ -164,8 +150,16 @@ export default class MetapageApp extends Component {
 			alert             : null,
 			metapageDefinition: null,
 		}
-		const url = hashParams['url'];
+		let url = hashParams['url'];
 		if (url) {
+			console.log('raw url', url);
+			if (!url.endsWith('.json')) {
+				if (!url.endsWith('/')) {
+					url += '/';
+				}
+				url += 'metapage.json';
+			}
+			console.log('final url', url);
 			this.setState({
 				alert : {level: 'primary', message: `loading url: ${url}`},
 				url   : url,
@@ -224,9 +218,10 @@ export default class MetapageApp extends Component {
 					return this.getHelp();
 				}
 				//<Plugins definition={metapageDefinition} />
+				const header = this.state.params['header'] == '0' ? null : <Header definition={metapageDefinition} url={this.state.url} />;
 				return (
 					<div id="app">
-						<Header definition={metapageDefinition} url={this.state.url} />
+						{header}
 						<MetapageView definition={metapageDefinition} metapage={metapage} setUrl={this.setUrl} />
 					</div>
 				);
