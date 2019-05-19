@@ -1,2 +1,2 @@
-docs/js/metapage/browser.js
-docs/js/metaframe/browser.js
+node_modules
+build
