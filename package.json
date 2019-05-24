@@ -5,7 +5,6 @@
   "homepage": "https://app.metapages.org/",
   "license": "MIT",
   "scripts": {
-    "pre-deploy": "npm run build && cp src/CNAME build/",
     "deploy": "gh-pages -d build",
     "start": "per-env",
     "start:production": "npm run -s serve",

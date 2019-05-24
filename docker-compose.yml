@@ -14,6 +14,7 @@ services:
       - "HIST_FILE=/root/.bash_history"
     volumes:
       - ./:/workspace
+      # A trick to get local aliases, bash history, and symlinks working
       - ${HOME}:${HOME}
       - ${HOME}/.bash_history:/root/.bash_history
       - ${HOME}/.aliases:/root/.aliases
@@ -21,6 +22,5 @@ services:
       - bridge
     ports:
       - "4010:${PORT_METAPAGE_APP:-4010}"
-
 
   
