@@ -4,13 +4,24 @@ import Header from './header';
 import HelpCard from './help';
 import Alert from './alert';
 import MetapageView from './view_metapage';
-// import Plugins from './plugins';
-
 
 const Status = Object.freeze(['loading', 'loaded', 'empty'].reduce((obj, currentVal) => {
 	obj[currentVal] = currentVal;
 	return obj;
 }, {}));
+
+const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const randomString = (length) => {
+    var text = "";
+    for(var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+const createNonce = () => {
+    return randomString(8);
+}
 
 export default class MetapageApp extends Component {
 	
@@ -18,7 +29,8 @@ export default class MetapageApp extends Component {
 		alert             : null,   // {level,message}
 		metapage          : null,
 		metapageDefinition: null,
-		params            : {},    // from the URL hash string
+		nonce_loading     : null,
+		params            : {},     // from the URL hash string
 		status            : null,   //Status.loading,
 		url               : null,
 	};
@@ -32,28 +44,33 @@ export default class MetapageApp extends Component {
 		window.onhashchange = null;
 	}
 
-	componentDidUpdate(prevProps, prevState) {
-
-	}
-
 	load = async () => {
 		if (this.state.metapage) {
 			this.state.metapage.dispose();
 		}
+
+		// if load is called again, the async portion of this will be cancelled
+		const nonce = createNonce();
+
 		this.setState({
 			alert             : null,
+			nonce_loading     : nonce,
 			metapage          : null,
 			metapageDefinition: null,
 			status            : Status.loading,
 		});
 		
-		if (Object.keys(this.state.params).length == 0) {
+		if (!this.state.params || Object.keys(this.state.params).length == 0) {
 			// This will show the help
 			this.setState({status:Status.empty});
 			return;
 		}
 		try {
-			const loadState = await this.getMetapageDefinitionFromParams(this.state.params);
+			const loadState = await this.getMetapageDefinitionFromParams(this.state.params); // { alert, metapageDefinition }
+			if (this.state.nonce_loading != nonce) {
+				console.log('Cancelling previous loading definition');
+				return;
+			}
 			this.setState(loadState);
 
 			const metapageDefinition = loadState.metapageDefinition;
@@ -133,12 +150,12 @@ export default class MetapageApp extends Component {
 			return null;
 		}
 		const tokens = hash.substr(1).split('&');
-		const params = {};
+		const hashParams = {};
 		tokens.forEach((token) => {
 			const keyVal = token.split('=');
-			params[keyVal[0]] = keyVal[1] || true;
+			hashParams[keyVal[0]] = keyVal[1] || true;
 		});
-		return params;
+		return hashParams;
 	}
 
 	setUrl = (url) => {
@@ -218,7 +235,7 @@ export default class MetapageApp extends Component {
 					return this.getHelp();
 				}
 				//<Plugins definition={metapageDefinition} />
-				const header = this.state.params['header'] == '0' ? null : <Header definition={metapageDefinition} url={this.state.url} />;
+				const header = this.state.params['header'] == '0' ? null : <Header definition={metapageDefinition} metapage={metapage} url={this.state.url} />;
 				return (
 					<div id="app">
 						{header}
