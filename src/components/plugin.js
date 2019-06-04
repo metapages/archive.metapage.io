@@ -3,7 +3,7 @@ import { h, Component } from 'preact';
 const RequiredProps = ['url', 'id', 'metapage'];
 
 // props: url, metapage, maxHeight, id (==url)
-export default class Plugin extends Component {
+export class Plugin extends Component {
     
 	// ensures the metaframe iframes aren't messed with
 	// tells Virtual DOM rendering/diffing algorithm that it shouldn't try to undo any external DOM mutations

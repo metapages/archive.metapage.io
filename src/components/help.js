@@ -6,25 +6,39 @@ export default class HelpCard extends Component {
             'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
             'https://metapages.org/metapages/dynamic-plot/metapage.json',
         ].map((exampleUrl) => <div class="siimple-btn" onClick={() => {props.setUrl(exampleUrl)}} >{exampleUrl}</div>);
+        const url = window.location.origin;
+        const urlExampleMetapageJsonAsHash = `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json`;
 		return (
-            <div class="siimple-card" style="max-width:600px">
+            <div class="siimple-card">
                 <div class="siimple-card-header">
-                Documentatation
+                    <a href="https://metapages.org/" class="siimple-link">Metapage</a> viewer
                 </div>
-                <div class="siimple-card-body">
-                    <div class="siimple-h3">URL hash parameters</div>
-                    <pre class="siimple-pre">
-                        Example:
-                        someurl
-                    </pre>
-                    <pre class="siimple-pre">
-                        url: points to the metapage JSON definition.
-                        base64: encoded string of the metapage JSON definition
-                    </pre>
+                
+                <div class="siimple-card-body">  
+                    This website takes a <a href="https://metapages.org/api/#metapagedefinition" class="siimple-link">metapage definition</a> and constructs the metapage application.
                 </div>
-                <div class="siimple-card-footer">
-                    {examples}
+
+                {/* <div class="siimple-rule"></div> */}
+
+                
+
+
+                <div class="siimple-card">
+                    <div class="siimple-card-header">
+                        The <a href="https://metapages.org/api/#metapagedefinition" class="siimple-link">metapage definition</a> can be given as a hash parameter (<code class="siimple-code">#url=?</code>):
+                    </div>
+                    <div class="siimple-card-body">
+                        {/* <a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a> */}
+                        <blockquote class="siimple-tip siimple-tip--primary">
+                            <a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a>
+                        </blockquote>
+                    </div>
                 </div>
+
+
+
+
+                
             </div>
         );
 	}

@@ -23,6 +23,61 @@ const createNonce = () => {
     return randomString(8);
 }
 
+const setHashParameter = (key, val) => {
+	let hash = document.location.hash;
+	if (hash.startsWith('#')) {
+		hash = hash.substr(1);
+	}
+	let tokens = hash.split('&');
+	let found = false;
+	for (let i = 0; i < tokens.length; i++) {
+		const token = tokens[i];
+		const keyVal = token.split('=');
+		if (keyVal[0] == key) {
+			tokens[i] = `${key}=${val}`;
+			found = true;
+			break;
+		}
+	}
+	if (!found) {
+		tokens.push(`${key}=${val}`);
+	}
+	tokens = tokens.filter(token => token.length > 1);
+	document.location.hash = tokens.join('&');
+}
+
+const removeHashParameter = (key) => {
+	let hash = document.location.hash;
+	if (hash.startsWith('#')) {
+		hash = hash.substr(1);
+	}
+	let tokens = hash.split('&').filter((token) => {
+		const keyVal = token.split('=');
+		return keyVal[0] != key;
+	});
+	document.location.hash = tokens.join('&');
+}
+
+const getHashParameters = () => {
+	const hash = document.location.hash;
+	// console.log('hash', hash);
+	if (hash.length < 3) {
+		//TODO set state to mean the page is empty, and probably show the docs
+		return null;
+	}
+	const tokens = hash.substr(1).split('&');
+	const hashParams = {};
+	tokens.forEach((token) => {
+		const keyVal = token.split('=');
+		hashParams[keyVal[0]] = keyVal[1] || true;
+	});
+	return hashParams;
+}
+
+const setUrl = (url) => {
+	setHashParameter('url', url);
+}
+
 export default class MetapageApp extends Component {
 	
 	state = {
@@ -102,64 +157,8 @@ export default class MetapageApp extends Component {
 	}
 
 	onHashChange = () => {
-		// console.log('onhashchanage', window.location.hash);
-		this.setState({params: this.getHashParameters()});
+		this.setState({params: getHashParameters()});
 		this.load();
-	}
-
-	setHashParameter = (key, val) => {
-		let hash = document.location.hash;
-		if (hash.startsWith('#')) {
-			hash = hash.substr(1);
-		}
-		let tokens = hash.split('&');
-		let found = false;
-		for (let i = 0; i < tokens.length; i++) {
-			const token = tokens[i];
-			const keyVal = token.split('=');
-			if (keyVal[0] == key) {
-				tokens[i] = `${key}=${val}`;
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			tokens.push(`${key}=${val}`);
-		}
-		tokens = tokens.filter(token => token.length > 1);
-		document.location.hash = tokens.join('&');
-	}
-
-	removeHashParameter = (key) => {
-		let hash = document.location.hash;
-		if (hash.startsWith('#')) {
-			hash = hash.substr(1);
-		}
-		let tokens = hash.split('&').filter((token) => {
-			const keyVal = token.split('=');
-			return keyVal[0] != key;
-		});
-		document.location.hash = tokens.join('&');
-	}
-
-	getHashParameters = () => {
-		const hash = document.location.hash;
-		// console.log('hash', hash);
-		if (hash.length < 3) {
-			//TODO set state to mean the page is empty, and probably show the docs
-			return null;
-		}
-		const tokens = hash.substr(1).split('&');
-		const hashParams = {};
-		tokens.forEach((token) => {
-			const keyVal = token.split('=');
-			hashParams[keyVal[0]] = keyVal[1] || true;
-		});
-		return hashParams;
-	}
-
-	setUrl = (url) => {
-		this.setHashParameter('url', url);
 	}
 
 	getMetapageDefinitionFromParams = async (hashParams) => {
@@ -201,7 +200,7 @@ export default class MetapageApp extends Component {
 	}
 
 	getHelp = () => {
-		return <HelpCard setUrl={this.setUrl}/>;
+		return <HelpCard setUrl={setUrl}/>;
 	}
 
 	getAlert = () => {
@@ -212,7 +211,7 @@ export default class MetapageApp extends Component {
 		switch(this.state.status) {
 			case Status.loading: { 
 				const alert = this.getAlert();
-				return <div class="siimple-list" style="max-width:600px;">
+				return <div class="siimple-list">
 					<div class="siimple-list-item">{alert}</div>
 					<div class="siimple-spinner siimple-spinner--primary"></div>
 				</div>;
@@ -220,7 +219,7 @@ export default class MetapageApp extends Component {
 			case Status.loaded: {
 				if (this.state.alert) {
 					const alert = this.getAlert();
-					return <div class="siimple-list" style="max-width:600px;">
+					return <div class="siimple-list">
 						<div class="siimple-list-item">{alert}</div>
 						<div class="siimple-list-item">{this.getHelp()}</div>
 					</div>
@@ -228,8 +227,7 @@ export default class MetapageApp extends Component {
 
 				const metapage = this.state.metapage;
 				const metapageDefinition = this.state.metapageDefinition;
-				// console.log('loaded metapage', metapage);
-				// console.log('loaded metapageDefinition', metapageDefinition);
+
 				// No data? Show the help then.
 				if (!metapage) {
 					return this.getHelp();
@@ -244,14 +242,14 @@ export default class MetapageApp extends Component {
 				);
 			}
 			case Status.empty: {
-				return <div class="siimple-list" style="max-width:600px;">
-					<div class="siimple-list-item"><Alert level="primary" message="No metapage definition" /></div>
+				return <div class="siimple-list">
+					{/* <div class="siimple-list-item"><Alert level="primary" message="No metapage definition" /></div> */}
 					{this.getHelp()}
 				</div>;
 			}
 			default: {
 				const alert = this.getAlert();
-				return <div class="siimple-list" style="max-width:600px;">
+				return <div class="siimple-list">
 					<div class="siimple-list-item">{alert}</div>
 					{this.getHelp()}
 				</div>;
