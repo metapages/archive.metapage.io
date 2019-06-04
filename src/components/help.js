@@ -2,12 +2,12 @@ import { h, Component } from 'preact';
 
 export default class HelpCard extends Component {
 	render(props) {
-        const examples = [
-            'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
-            'https://metapages.org/metapages/dynamic-plot/metapage.json',
-        ].map((exampleUrl) => <div class="siimple-btn" onClick={() => {props.setUrl(exampleUrl)}} >{exampleUrl}</div>);
-        const url = window.location.origin;
-        const urlExampleMetapageJsonAsHash = `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json`;
+        // const examples = [
+        //     'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
+        //     'https://metapages.org/metapages/dynamic-plot/metapage.json',
+        // ].map((exampleUrl) => <div class="siimple-btn" onClick={() => {props.setUrl(exampleUrl)}} >{exampleUrl}</div>);
+
+        const urlExampleMetapageJsonAsHash = typeof window !== "undefined" ? `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json` : null;
 		return (
             <div class="siimple-card">
                 <div class="siimple-card-header">
@@ -19,9 +19,6 @@ export default class HelpCard extends Component {
                 </div>
 
                 {/* <div class="siimple-rule"></div> */}
-
-                
-
 
                 <div class="siimple-card">
                     <div class="siimple-card-header">
@@ -35,10 +32,6 @@ export default class HelpCard extends Component {
                     </div>
                 </div>
 
-
-
-
-                
             </div>
         );
 	}
