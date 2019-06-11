@@ -2,10 +2,10 @@
  * Data flow:
  *  - if hash parameter "url" for a url to a metapage.json file
  * 		- if there, load it
- * 		- if an error, show the error at the top 
+ * 		- if an error, show the error
  *  - elseif check hash parameter "base64" for an encoded metapage json blob
  * 		- if there, load it
- * 		- if an error, show the error at the top
+ * 		- if an error, show the error bottom of the text field
  * 		- also show the json in the help text box
  *  - else show the help 
  */
@@ -13,7 +13,6 @@
 import { h, Component } from 'preact';
 import { Metapage } from 'metapage';
 import Header from './header';
-// import HelpCard from './help';
 import Alert from './alert';
 import MetapageView from './view_metapage';
 
@@ -99,26 +98,10 @@ const setHashParameter = (key, val) => {
 	else {
 		location.hash = `#${tokens.join('&')}`;
 	}
-
-
-	// document.location.hash = tokens.join('&');
 }
-
-// const removeHashParameter = (key) => {
-// 	let hash = document.location.hash;
-// 	if (hash.startsWith('#')) {
-// 		hash = hash.substr(1);
-// 	}
-// 	let tokens = hash.split('&').filter((token) => {
-// 		const keyVal = token.split('=');
-// 		return keyVal[0] != key;
-// 	});
-// 	document.location.hash = tokens.join('&');
-// }
 
 const getHashParameters = () => {
 	const hash = document.location.hash;
-	// console.log('hash', hash);
 	if (hash.length < 3) {
 		//TODO set state to mean the page is empty, and probably show the docs
 		return null;
@@ -131,30 +114,6 @@ const getHashParameters = () => {
 	});
 	return hashParams;
 }
-
-// const getHashParameters = () => {
-// 	const hash = document.location.hash;
-// 	// console.log('hash', hash);
-// 	if (hash.length < 3) {
-// 		//TODO set state to mean the page is empty, and probably show the docs
-// 		return null;
-// 	}
-// 	const tokens = hash.substr(1).split('&');
-// 	const hashParams = {};
-// 	tokens.forEach((token) => {
-// 		const keyVal = token.split('=');
-// 		hashParams[keyVal[0]] = keyVal[1] || true;
-// 	});
-// 	return hashParams;
-// }
-
-// const setHashParamUrl = (url) => {
-// 	setHashParameter('url', url);
-// }
-
-// const setUrl = (url) => {
-// 	setHashParameter('url', url);
-// }
 
 export default class MetapageApp extends Component {
 	
@@ -170,8 +129,6 @@ export default class MetapageApp extends Component {
 	};
 
 	componentDidMount() {
-		// window.onhashchange = this.onHashChange;
-		// this.onHashChange();
 		window.onhashchange = this.load;
 		this.load();
 	}
@@ -179,14 +136,6 @@ export default class MetapageApp extends Component {
 	componentWillUnmount() {
 		window.onhashchange = null;
 	}
-
-	// onHashChange = () => {
-	// 	console.log('onHashChange');
-	// 	// this.setState({
-			
-	// 	// });
-	// 	this.load();
-	// }
 
 	load = async () => {
 		if (this.state.metapage) {
@@ -221,48 +170,41 @@ export default class MetapageApp extends Component {
 		};
 
 		this.setState({
-			alert                : null, // <null|string>
+			alert             : null,   // <null|string>
 			loadResult,
-			// nonce_loading     : nonce,
-			metapage             : null,
-			metapageDefinition:    null,
-			// params            : getHashParameters(),
-			status               : Status.loading,
+			metapage          : null,
+			metapageDefinition: null,
+			status            : Status.loading,
 		});
 		
-		// try {
-			const blob = await this.getMetapageDefinitionFromParams(loadResult.key, loadResult.value, nonce); // { alert, metapageDefinition }
-			const error = blob.error;
-			const metapageDefinition = blob.metapageDefinition;
-			if (this.state.loadResult.nonce != nonce) {
-				console.log('Cancelling previous loading definition');
-				// actually bail out early in this 
-				return;
+		const blob = await this.getMetapageDefinitionFromParams(loadResult.key, loadResult.value, nonce); // { alert, metapageDefinition }
+		const error = blob.error;
+		const metapageDefinition = blob.metapageDefinition;
+		if (this.state.loadResult.nonce != nonce) {
+			console.log('Cancelling previous loading definition');
+			// actually bail out early in this 
+			return;
+		}
+		// make new object so react picks up the state diff
+		const newState = {
+			loadResult        : Object.assign({}, loadResult),
+			metapage          : null,
+			metapageDefinition: null,
+			status            : Status.loaded,
+		};
+		if (error) {
+			newState.loadResult.alert = { level: 'error', message: error};
+		} else if (!metapageDefinition) {
+			newState.loadResult.alert = { level: 'error', message: 'No metapage definition found'};
+		} else {
+			newState.metapageDefinition = metapageDefinition;
+			try {
+				newState.metapage = Metapage.from(metapageDefinition);
+			} catch(err) {
+				newState.loadResult.alert = { level: 'error', message: `Failed to create a matapage from the definition: ${err}` };
 			}
-			// make new object so react picks up the state diff
-			const newState = {
-				loadResult        : Object.assign({}, loadResult),
-				metapage          : null,
-				metapageDefinition: null,
-				status            : Status.loaded,
-			};
-			if (error) {
-				newState.loadResult.alert = { level: 'error', message: error};
-			} else if (!metapageDefinition) {
-				newState.loadResult.alert = { level: 'error', message: 'No metapage definition found'};
-			} else {
-				newState.metapageDefinition = metapageDefinition;
-				try {
-					newState.metapage = Metapage.from(metapageDefinition);
-				} catch(err) {
-					newState.loadResult.alert = { level: 'error', message: `Failed to create a matapage from the definition: ${err}` };
-				}
-			}
-			this.setState(newState);
-		// } catch (err) {
-		// 	console.error(err);
-		// 	this.setState({alert: { level: 'error', message: `Should never get to this state: ${err}` }});
-		// }
+		}
+		this.setState(newState);
 	}
 
 	getMetapageDefinitionFromParams = async (key, value, nonce) => {
@@ -298,21 +240,17 @@ export default class MetapageApp extends Component {
 				result.error = `Failed to load #url ${err}`;
 			}
 		} else if (key === 'base64') {
-			console.log('Decoding base64');
-			// console.log(value);
 			const base64String = value;
 			let metapageJsonString;
 			try {
 				metapageJsonString = atob(base64String);
+				this.setState({base64Text:metapageJsonString});
 				try {
-					console.log('final metapageJsonString decoded', metapageJsonString);
 					result.metapageDefinition = JSON.parse(metapageJsonString);
 				} catch(err) {
-					console.error(err);
 					result.error = `Failed to JSON.parse #base64: ${err}`;
 				}
 			} catch(err) {
-				console.error(err);
 				result.error = `Not valid base64: ${err}`;
 			}
 		}
@@ -321,35 +259,12 @@ export default class MetapageApp extends Component {
 
 	setExampleBase64 = () => {
 		this.setState({base64Text:exampleJson});
-		// document.getElementById("text:metapage.json").value = exampleJson;
     }
 
 	setMetapageJsonBase64 = () => {
 		const metapageJsonString = document.getElementById("text:metapage.json").value;
-		console.log(metapageJsonString);
 		setHashParameter('base64', btoa(metapageJsonString));
-		this.load();
-        
-        // try {
-        //     // try to parse the JSON string
-        //     JSON.parse(metapageJsonString);
-        //     setHashParameter('base64', btoa(metapageJsonString));
-        // } catch(err) {
-		// 	// do something fancier there
-		// 	let loadResult = Object.assign({}, this.state.loadResult);
-		// 	loadResult.alert = {level: 'error', message: `Failed to parse JSON: ${err}`};
-        //     this.setState({loadResult});
-        //     console.error(err);
-        // }
-        // document.location.hash = 'base64=' + btoa(unescape(encodeURIComponent(JSON.stringify(metapageDef))));
-        
-    }
-
-    onKeyDown = (e) => {
-        console.log(`keyCode=${event.keyCode}`);
-        // if (event.keyCode === 13) {
-        //     this.setMetapageJsonBase64();
-        // }
+		this.load();        
     }
 
 	getAlert = (key) => {
@@ -374,10 +289,6 @@ export default class MetapageApp extends Component {
 		const mainAlert = this.getAlert();
 		const alertUrl = this.getAlert('url');
 		const alertBase64 = this.getAlert('base64');
-
-		console.log('render loadResult', this.state.loadResult);
-
-		console.log('alertBase64', alertBase64);
 
 		return <div>
 				{mainAlert}
@@ -405,7 +316,7 @@ export default class MetapageApp extends Component {
 							<label class="siimple-label">(<code class="siimple-code">#base64=?</code>) containing the base64 encoded metapage JSON:</label>
 							<div class="siimple-btn siimple-btn--primary siimple-btn--small" onClick={this.setExampleBase64} >Example</div>
 							<br/>
-							<textarea id="text:metapage.json" class="siimple-textarea siimple-textarea--fluid" rows={this.state.base64Text != null ? this.state.base64Text.split("\n").length : 5} onKeyDown={this.onKeyDown}>
+							<textarea id="text:metapage.json" class="siimple-textarea siimple-textarea--fluid" rows={this.state.base64Text != null ? this.state.base64Text.split("\n").length : 5} >
 							{this.state.base64Text}
 							</textarea>
 							<div class="siimple-btn siimple-btn--primary" onClick={this.setMetapageJsonBase64} >Load</div>
