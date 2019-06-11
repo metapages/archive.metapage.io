@@ -48,7 +48,7 @@ const examples = [
 	'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
 	'https://metapages.org/metapages/dynamic-plot/metapage.json',
 ]
-.map((url) => `${window.location.origin}/#url=${url}`)
+.map((url) => `${typeof window !== "undefined" ? window.location.origin: ""}/#url=${url}`)
 .map((url) => <div class="siimple-list-item"><a href={url} class="siimple-link">{url}</a></div>);
 
 const urlExampleMetapageJsonAsHash = typeof window !== "undefined" ? `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json` : null;
