@@ -28,7 +28,7 @@ const getLayout = (metapageDefinition, layoutName) => {
     }
  */
 const generateDefaultLayout = (metapage) => {
-	const metaframes = metapage.metaframes();
+	const metaframes = metapage.getMetaframes();
 	const metaframeIds = Object.keys(metaframes);
 	let columns = 2;
 	if (metaframeIds.length < 2) {

@@ -33,8 +33,8 @@
   "dependencies": {
     "flexboxgrid": "^6.3.1",
     "gh-pages": "^2.0.1",
-    "metaframe": "^0.2.0",
-    "metapage": "^0.2.0",
+    "metaframe": "^0.3.0",
+    "metapage": "^0.3.0",
     "preact": "^8.2.6",
     "preact-compat": "^3.17.0",
     "siimple": "^3.3.1"
