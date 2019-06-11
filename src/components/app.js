@@ -45,6 +45,15 @@ const exampleJson = JSON.stringify({
 	}
 }, null, "  ");
 
+const examples = [
+	'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
+	'https://metapages.org/metapages/dynamic-plot/metapage.json',
+]
+.map((url) => `${window.location.origin}/#url=${url}`)
+.map((url) => <div class="siimple-list-item"><a href={url} class="siimple-link">{url}</a></div>);
+
+const urlExampleMetapageJsonAsHash = typeof window !== "undefined" ? `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json` : null;
+
 const Status = Object.freeze(['loading', 'loaded', 'help'].reduce((obj, currentVal) => {
 	obj[currentVal] = currentVal;
 	return obj;
@@ -151,6 +160,7 @@ export default class MetapageApp extends Component {
 	
 	state = {
 		alert             : null,   // {level,message}
+		base64Text        : null,
 		metapage          : null,
 		metapageDefinition: null,
 		nonce_loading     : null,
@@ -183,157 +193,240 @@ export default class MetapageApp extends Component {
 			this.state.metapage.dispose();
 		}
 
-		// if load is called again, the async portion of this will be cancelled
-		const nonce = createNonce();
+		const hashParams = getHashParameters();
 
-		this.setState({
-			alert             : null,
-			nonce_loading     : nonce,
-			metapage          : null,
-			metapageDefinition: null,
-			params            : getHashParameters(),
-			status            : Status.loading,
-		});
-		
-		if (!this.state.params || Object.keys(this.state.params).length == 0) {
-			// This will show the help
-			console.log('empty state.params');
-			console.log(getHashParameters());
-			this.setState({status:Status.help});
+		// Only one hash param allowed, otherwise what to do?
+		const moreThanOneParam = hashParams && hashParams['url'] && hashParams['base64'];
+		const noParams = !hashParams || Object.keys(hashParams).length == 0;
+		if (moreThanOneParam || noParams) {
+			this.setState({
+				alert             : moreThanOneParam ? "Only one hash param allowed (url or base64)" : null,
+				metapage          : null,
+				metapageDefinition: null,
+				loadResult        : null,
+				status            : Status.help,
+			});
 			return;
 		}
-		try {
-			const loadState = await this.getMetapageDefinitionFromParams(this.state.params); // { alert, metapageDefinition }
-			if (this.state.nonce_loading != nonce) {
+
+		const paramKey = hashParams['url'] ? 'url' : 'base64'; // if more are supported add here
+
+		// if load is called again, the async portion of this will be cancelled
+		const nonce = createNonce();
+		let loadResult = { // {key:["url"|"base64"|"metaframe"], alert:<null|string>, nonce:<null|string>}
+			alert: null,
+			key  : paramKey,
+			value: hashParams[paramKey],
+			nonce,
+		};
+
+		this.setState({
+			alert                : null, // <null|string>
+			loadResult,
+			// nonce_loading     : nonce,
+			metapage             : null,
+			metapageDefinition:    null,
+			// params            : getHashParameters(),
+			status               : Status.loading,
+		});
+		
+		// try {
+			const blob = await this.getMetapageDefinitionFromParams(loadResult.key, loadResult.value, nonce); // { alert, metapageDefinition }
+			const error = blob.error;
+			const metapageDefinition = blob.metapageDefinition;
+			if (this.state.loadResult.nonce != nonce) {
 				console.log('Cancelling previous loading definition');
+				// actually bail out early in this 
 				return;
 			}
-			this.setState(loadState);
-
-			const metapageDefinition = loadState.metapageDefinition;
-
-			let metapage = null;
-			if (metapageDefinition) {
+			// make new object so react picks up the state diff
+			const newState = {
+				loadResult        : Object.assign({}, loadResult),
+				metapage          : null,
+				metapageDefinition: null,
+				status            : Status.loaded,
+			};
+			if (error) {
+				newState.loadResult.alert = { level: 'error', message: error};
+			} else if (!metapageDefinition) {
+				newState.loadResult.alert = { level: 'error', message: 'No metapage definition found'};
+			} else {
+				newState.metapageDefinition = metapageDefinition;
 				try {
-					metapage = Metapage.from(metapageDefinition);
-					//TODO later
-					// document.location.hash = 'base64=' + btoa(unescape(encodeURIComponent(JSON.stringify(metapageDef))));
-					this.setState({metapage: metapage});
+					newState.metapage = Metapage.from(metapageDefinition);
 				} catch(err) {
-					this.setState({
-						alert : {level: 'error', message: `Failed to load metapage object: ${err}`},
-					});
+					newState.loadResult.alert = { level: 'error', message: `Failed to create a matapage from the definition: ${err}` };
 				}
 			}
-
-			this.setState({
-				status: Status.loaded,
-			});
-			
-		} catch(err) {
-			this.setState({
-				alert : {level: 'error', message: err},
-				status: Status.loaded,
-			});
-		}
+			this.setState(newState);
+		// } catch (err) {
+		// 	console.error(err);
+		// 	this.setState({alert: { level: 'error', message: `Should never get to this state: ${err}` }});
+		// }
 	}
 
-	getMetapageDefinitionFromParams = async (hashParams) => {
+	getMetapageDefinitionFromParams = async (key, value, nonce) => {
 		const result = {
-			alert             : null,
-			metapageDefinition: null,
+			error             : undefined,
+			metapageDefinition: undefined,
 		}
 		
-		if (hashParams['url']) {
-			let url = hashParams['url'];
-			console.log('raw url', url);
+		if (key === 'url') {
+			let url = value;
 			if (!url.endsWith('.json')) {
 				if (!url.endsWith('/')) {
 					url += '/';
 				}
 				url += 'metapage.json';
 			}
-			console.log('final url', url);
 			this.setState({
-				alert : {level: 'primary', message: `loading url: ${url}`},
-				url   : url,
+				loadingResult: {
+					alert : {level: 'primary', message: `loading: ${url}`},
+					key,
+					nonce,
+					url,
+				},
 			});
-			// console.log(`loading ${url}`);
-			let response;
 			try {
-				response = await fetch(url);
-			} catch (err) {
-				result.alert = { level: 'error', message: `Failed to load #url ${err}`};
-			}
-			try {
-				if (response) {
-					const metapageDefinition = await response.json();
-					result.metapageDefinition = metapageDefinition;
+				const response = await fetch(url);
+				try {
+					result.metapageDefinition = await response.json();
+				} catch (err) {
+					result.error = `Failed to parse metapage JSON: ${err}`;
 				}
 			} catch (err) {
-				result.alert = { level: 'error', message: `Failed to parse metapage JSON: ${err}`};
+				result.error = `Failed to load #url ${err}`;
 			}
-		} else if (hashParams['base64']) {
-			const base64String = hashParams['base64'];
-			const metapageJsonString = atob(decodeURIComponent(base64String))
-			console.log('final metapageJsonString decoded', metapageJsonString);
+		} else if (key === 'base64') {
+			console.log('Decoding base64');
+			// console.log(value);
+			const base64String = value;
+			let metapageJsonString;
 			try {
-				result.metapageDefinition = JSON.parse(metapageJsonString);
+				metapageJsonString = atob(base64String);
+				try {
+					console.log('final metapageJsonString decoded', metapageJsonString);
+					result.metapageDefinition = JSON.parse(metapageJsonString);
+				} catch(err) {
+					console.error(err);
+					result.error = `Failed to JSON.parse #base64: ${err}`;
+				}
 			} catch(err) {
-				result.alert = { level: 'error', message: `Failed to decode #base64 ${err}`};
+				console.error(err);
+				result.error = `Not valid base64: ${err}`;
 			}
 		}
 		return result;
 	}
 
-	loadMetapageJson = () => {
-        const metapageJsonString = document.getElementById("text:metapage.json").value;
-        console.log(metapageJsonString);
-        try {
-            // try to parse the JSON string
-            JSON.parse(metapageJsonString);
-            this.props.setHashParameter('base64', btoa(encodeURIComponent(metapageJsonString)));
-        } catch(err) {
-            // do something fancier there
-            this.props.setState({
-                alert : {level: 'error', message: `Failed to parse JSON: ${err}`},
-            });
-            // console.error(err);
-        }
+	setExampleBase64 = () => {
+		this.setState({base64Text:exampleJson});
+		// document.getElementById("text:metapage.json").value = exampleJson;
+    }
+
+	setMetapageJsonBase64 = () => {
+		const metapageJsonString = document.getElementById("text:metapage.json").value;
+		console.log(metapageJsonString);
+		setHashParameter('base64', btoa(metapageJsonString));
+		this.load();
+        
+        // try {
+        //     // try to parse the JSON string
+        //     JSON.parse(metapageJsonString);
+        //     setHashParameter('base64', btoa(metapageJsonString));
+        // } catch(err) {
+		// 	// do something fancier there
+		// 	let loadResult = Object.assign({}, this.state.loadResult);
+		// 	loadResult.alert = {level: 'error', message: `Failed to parse JSON: ${err}`};
+        //     this.setState({loadResult});
+        //     console.error(err);
+        // }
         // document.location.hash = 'base64=' + btoa(unescape(encodeURIComponent(JSON.stringify(metapageDef))));
         
     }
 
     onKeyDown = (e) => {
         console.log(`keyCode=${event.keyCode}`);
-        if (event.keyCode === 13) {
-            this.loadMetapageJson();
-        }
+        // if (event.keyCode === 13) {
+        //     this.setMetapageJsonBase64();
+        // }
     }
 
-	// getHelp = () => {
-	// 	return <HelpCard setHashParameter={setHashParameter} setState={this.setState} />;
-	// }
-
-	getAlert = () => {
-		return this.state.alert ? <Alert {...this.state.alert} /> : null;
+	getAlert = (key) => {
+		if (!key) {
+			return this.state.alert ? <div><Alert {...this.state.alert} /><br/></div> : null;
+		} else {
+			return this.state.loadResult && this.state.loadResult.key === key && this.state.loadResult.alert
+				? <div><Alert {...this.state.loadResult.alert} /><br/></div>
+				: null;
+		}
 	}
 
 	render() {
-		switch(this.state.status) {
-			case Status.loading: { 
-				return this.renderStatusLoading();
-			} 
-			case Status.loaded: {
-				return this.renderStatusLoaded();
-			}
-			case Status.help: {
-				return this.renderStatusHelp();
-			}
-			default: {
-				throw `Uknown status: ${this.state.status}`;
-			} 
+		// if there's a metapage, we don't care about anything else
+		if (this.state.metapage) {
+			return this.renderMetapage();
+		// the loading status is minimal
+		} else if (this.state.status == Status.loading) {
+			return this.renderStatusLoading();
 		}
+		// Otherwise it's the main help page with various alerts etc
+		const mainAlert = this.getAlert();
+		const alertUrl = this.getAlert('url');
+		const alertBase64 = this.getAlert('base64');
+
+		console.log('render loadResult', this.state.loadResult);
+
+		console.log('alertBase64', alertBase64);
+
+		return <div>
+				{mainAlert}
+				
+				<div class="siimple-card">
+					<div class="siimple-card-header">
+						<a href="https://metapages.org/" class="siimple-link">Metapage</a> viewer
+					</div>
+					
+					<div class="siimple-card-body">  
+						Provide a <a href="https://metapages.org/api/#metapagedefinition" class="siimple-link">metapage definition</a> and this app will build the application. The definition can be provided in the URL hash parameters one of two ways:
+					</div>
+
+					<div class="siimple-card">
+						
+						<div class="siimple-card-body">
+						<label class="siimple-label">(<code class="siimple-code">#url=?</code>) pointing to the location of the metapage.json, e.g.:</label><br/>
+							<a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a>
+						</div>
+						{alertUrl}
+					</div>
+
+					<div class="siimple-card">
+						<div class="siimple-card-body">
+							<label class="siimple-label">(<code class="siimple-code">#base64=?</code>) containing the base64 encoded metapage JSON:</label>
+							<div class="siimple-btn siimple-btn--primary siimple-btn--small" onClick={this.setExampleBase64} >Example</div>
+							<br/>
+							<textarea id="text:metapage.json" class="siimple-textarea siimple-textarea--fluid" rows={this.state.base64Text != null ? this.state.base64Text.split("\n").length : 5} onKeyDown={this.onKeyDown}>
+							{this.state.base64Text}
+							</textarea>
+							<div class="siimple-btn siimple-btn--primary" onClick={this.setMetapageJsonBase64} >Load</div>
+							
+							{alertBase64}
+						</div>
+					</div>
+
+					<br/><br/><br/>
+
+					<div class="siimple-card">
+						<div class="siimple-card-body">
+							<label class="siimple-label">Examples:</label><br/>
+							<div class="siimple-list">
+								{examples}
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
 	}
 
 	renderStatusHelp = () => {
@@ -350,6 +443,7 @@ export default class MetapageApp extends Component {
 	}
 
 	renderStatusLoading = () => {
+
 		const alert = this.getAlert();
 		return <div class="siimple-list">
 			<div class="siimple-list-item">{alert}</div>
@@ -374,68 +468,8 @@ export default class MetapageApp extends Component {
 		return (
 			<div id="app">
 				{header}
-				<MetapageView definition={metapageDefinition} metapage={metapage} setHashParameter={this.setHashParameter} />
+				<MetapageView definition={metapageDefinition} metapage={metapage} setHashParameter={setHashParameter} />
 			</div>
 		);
 	}
-
-	renderMain = () => {
-        const examples = [
-            'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
-            'https://metapages.org/metapages/dynamic-plot/metapage.json',
-        ]
-        .map((url) => `${window.location.origin}/#url=${url}`)
-        .map((url) => <div class="siimple-list-item"><a href={url} class="siimple-link">{url}</a></div>);
-        
-        
-        // <div class="siimple-btn" onClick={() => {props.setHashParameter('url', exampleUrl)}} >{exampleUrl}</div>);
-
-
-        // <a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a>
-
-        const urlExampleMetapageJsonAsHash = typeof window !== "undefined" ? `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json` : null;
-
-		return (
-            <div class="siimple-card">
-                <div class="siimple-card-header">
-                    <a href="https://metapages.org/" class="siimple-link">Metapage</a> viewer
-                </div>
-                
-                <div class="siimple-card-body">  
-                    Provide a <a href="https://metapages.org/api/#metapagedefinition" class="siimple-link">metapage definition</a> and this app will build the application. The definition can be provided in the URL hash parameters one of two ways::
-                </div>
-
-                <div class="siimple-card">
-                    
-                    <div class="siimple-card-body">
-                    <label class="siimple-label">(<code class="siimple-code">#url=?</code>) pointing to the location of the metapage.json, e.g.:</label><br/>
-                        <a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a>
-                    </div>
-                </div>
-
-                <div class="siimple-card">
-                    <div class="siimple-card-body">
-                        <label class="siimple-label">(<code class="siimple-code">#base64=?</code>) containing the base64 encoded metapage JSON:</label><br/>
-                        <textarea id="text:metapage.json" class="siimple-textarea siimple-textarea--fluid" rows="5" onKeyDown={this.onKeyDown}>
-                        {exampleJson}
-                        </textarea>
-                        <div class="siimple-btn siimple-btn--primary" onClick={this.loadMetapageJson} >Load</div>
-                    </div>
-                </div>
-
-                <br/><br/><br/>
-
-                <div class="siimple-card">
-                    <div class="siimple-card-body">
-                        <label class="siimple-label">Examples:</label><br/>
-                        <div class="siimple-list">
-                            {examples}
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        );
-	}
-
 }
