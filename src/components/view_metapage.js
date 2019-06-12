@@ -2,7 +2,6 @@ import { h, Component } from 'preact';
 import Metaframe from './metaframe';
 
 const getLayout = (metapageDefinition, layoutName) => {
-	// console.log('getLayout metapageDefinition', metapageDefinition);
 	if (metapageDefinition == null || metapageDefinition.meta == null || metapageDefinition.meta.layouts == null) {
 		return null;
 	}
@@ -34,7 +33,6 @@ const generateDefaultLayout = (metapage) => {
 	if (metaframeIds.length < 2) {
 		columns = 1;
 	}
-	console.log('columns', columns);
 	metaframeIds.sort();
 	const result = [];
 	let rowIndex = 0;
