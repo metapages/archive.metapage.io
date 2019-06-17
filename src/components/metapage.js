@@ -51,52 +51,28 @@ const generateDefaultLayout = (metapage) => {
 	return {layout:{layout:result}, layoutName:'flexboxgrid'};
 }
 
-// const getCssNumber = (val, defaultVal) => {
-// 	if (val) {
-// 		switch(typeof(val)) {
-// 			case 'number': {
-// 				return val;
-// 			}
-// 			case 'string': {
-// 				if (val.endsWith('px')) {
-// 					return parseFloat(val.replace('px', ''));
-// 				} else {
-// 					return parseFloat(val);
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return defaultVal;
-// }
-
 /**
  * Generate the virtual dom of the layed out metaframes
  * @param {*} layout 
  * @param {*} metapage 
  *    "meta": {
-//     "plugins": [],
-//     "layouts": {
-//       "flexboxgrid" : {
-//         "version": 1,
-//         "docs": "http://flexboxgrid.com/",
-//         "layout": [
-//           [ {"name":"input-button", "width":"col-xs-4", "height": "200px"}, {"name":"viewer1", "width":"col-xs-8"}  ],
-//           [ {"name":"passthrough1", "width":"col-xs-6", "height": "100px"}, {"name":"viewer2", "width":"col-xs-4"} ],
-//           [ {"name":"passthrough2", "width":"col-xs-4", "height": "300px"}, {"name":"viewer3", "width":"col-xs-4"} ]
-//         ],
-//         "options": {
-//           "arrows": true
-//         }
-//       }
-//     }
-//   }
+ *      "plugins": [],
+ *      "layouts": {
+ *        "flexboxgrid" : {
+ *          "version": 1,
+ *          "docs": "http://flexboxgrid.com/",
+ *          "layout": [
+ *            [ {"name":"input-button", "width":"col-xs-4", "height": "200px"}, {"name":"viewer1", "width":"col-xs-8"}  ],
+ *            [ {"name":"passthrough1", "width":"col-xs-6", "height": "100px"}, {"name":"viewer2", "width":"col-xs-4"} ],
+ *            [ {"name":"passthrough2", "width":"col-xs-4", "height": "300px"}, {"name":"viewer3", "width":"col-xs-4"} ]
+ *          ],
+ *          "options": {
+ *            "arrows": true
+ *          }
+ *        }
+ *      }
+ *    }
  */
-
-
-
-
-
-
 const getFlexboxRowElementMetaframe = (params) => {
 	var {rowElement, metaframes, defaultRowStyle} = params;
 	const metaframeId = rowElement.name;
@@ -127,11 +103,12 @@ const getFlexboxRowElementUrl = (params) => {
 	var {url, width, style} = rowElement;
 	const colClass = width ? width : 'col-xs';
 	style = style ? style : defaultRowStyle;
-	return <div id={url} class={colClass}>
-		<div class="iframe-container" style={style}>
-			<iframe src={url} sandbox="allow-scripts"></iframe>
-		</div>
-	</div>;
+	return (
+		<div id={url} class={colClass}>
+			<div class="iframe-container" style={style}>
+				<iframe src={url} sandbox="allow-scripts"></iframe>
+			</div>
+		</div>);
 }
 
 const getFlexboxRowElement = (params) => {
@@ -158,9 +135,10 @@ const applyLayout = (name, layout, metapage) => {
 				const rowElements = layoutRow.map((rowElement) => {
 					return getFlexboxRowElement({rowElement, metaframes, defaultRowStyle});
 				});
-				return <div class="row">
-					{rowElements}
-				</div>;
+				return (
+					<div class="row">
+						{rowElements}
+					</div>);
 			});
 		default:
 			throw `Unknown layout: ${name}`;

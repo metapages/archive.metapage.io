@@ -44,29 +44,3 @@ export default class Metaframe extends Component {
 		return <div class="iframe-container" id={id} style={props.style}> {warning} </div>;
 	}
 }
-
-// export default class ViewMetaframe extends Component {
-// 	render(props) {
-// 		const style = props.style;
-// 		// const classes = props.classes;
-// 		const metaframe = <Metaframe id={props.id} iframe={props.iframe} maxHeight={props.maxHeight} />
-// 		const header = props.displayName ? <div class="siimple-card-header">{props.id}</div> : undefined;
-		// console.log('header', header);
-		// console.log('props.displayName', props.displayName);
-		// If you return an undefined header, it still shows a stupid grey bar
-		// const classes = `siimple-card ${props.classes != null ? props.classes : ""}`;
-		// return header ?
-		// 	(<div class={classes} id={props.id} style={style} >
-		// 		{header}
-		// 		<div class="siimple-card-body">
-		// 			{metaframe}
-		// 		</div>
-		// 	</div>)
-		// 	:
-		// 	(<div class={classes} id={props.id} style={style} >
-		// 		<div class="siimple-card-body">
-		// 			{metaframe}
-		// 		</div>
-		// 	</div>);
-// 	}
-// }

@@ -14,7 +14,7 @@ import { h, Component } from 'preact';
 import { Metapage } from 'metapage';
 import Header from './header';
 import Alert from './alert';
-import MetapageView from './view_metapage';
+import MetapageView from './metapage';
 
 const exampleJson = JSON.stringify({
 	"version": "0.3",
@@ -41,7 +41,12 @@ const exampleJson = JSON.stringify({
 			}
 		]
 		}
-	}
+	},
+	"plugins": [
+		"https://metapages.org/metaframes/mermaid.js/?TITLE=0",
+		"https://metapages.org/metaframes/passthrough/",
+		"https://metapages.github.io/metaframe-editor-json/"
+	]
 }, null, "  ");
 
 const examples = [
@@ -374,7 +379,6 @@ export default class MetapageApp extends Component {
 		const metapage = this.state.metapage;
 		const metapageDefinition = this.state.metapageDefinition;
 
-		//<Plugins definition={metapageDefinition} />
 		const header = this.state.params['header'] == '0' ? null : <Header definition={metapageDefinition} metapage={metapage} url={this.state.url} />;
 		return (
 			<div id="app">
