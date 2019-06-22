@@ -32,7 +32,7 @@ watch:
     nodemon --watch src --exec just build
 
 # deploy to gh-pages branch
-deploy: build
+publish: build
 	npm run deploy
 
 # CLI shell in the docker container
