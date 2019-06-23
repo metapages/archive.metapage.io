@@ -10,9 +10,9 @@ _first:
 help:
     @just --list
 
-# Run the stack, defaulting to all. Just target "jekyll" for a minimal server
-run +TARGET='jekyll builder-haxe test':
-    docker-compose up --remove-orphans {{TARGET}}
+# Run the stack. Actually easier to just serve but whatever
+run:
+    docker-compose up --remove-orphans
 
 # serve and build on [src] change
 serve:

@@ -31,7 +31,11 @@ const exampleJson = JSON.stringify({
 export default class HelpCard extends Component {
 
     loadMetapageJson = () => {
-        const metapageJsonString = document.getElementById("text:metapage.json").value;
+		// preact pre-rendering with node
+        if (typeof window === "undefined") {
+			return;
+        }
+        const metapageJsonString = typeof window !== "undefined" ? window.document.getElementById("text:metapage.json").value : null;
         console.log(metapageJsonString);
         try {
             // try to parse the JSON string
@@ -42,10 +46,7 @@ export default class HelpCard extends Component {
             this.props.setState({
                 alert : {level: 'error', message: `Failed to parse JSON: ${err}`},
             });
-            // console.error(err);
         }
-        // document.location.hash = 'base64=' + btoa(unescape(encodeURIComponent(JSON.stringify(metapageDef))));
-        
     }
 
     onKeyDown = (e) => {
@@ -60,7 +61,7 @@ export default class HelpCard extends Component {
             'https://metapages.org/metapages/linked-molecule-viewers/metapage.json',
             'https://metapages.org/metapages/dynamic-plot/metapage.json',
         ]
-        .map((url) => `${window.location.origin}/#url=${url}`)
+        .map((url) => `${typeof window !== "undefined" ? window.location.origin : ""}/#url=${url}`)
         .map((url) => <div class="siimple-list-item"><a href={url} class="siimple-link">{url}</a></div>);
         
         
@@ -69,7 +70,9 @@ export default class HelpCard extends Component {
 
         // <a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a>
 
-        const urlExampleMetapageJsonAsHash = typeof window !== "undefined" ? `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json` : null;
+		const urlExampleMetapageJsonAsHash = typeof window !== "undefined"
+			? `${window.location.origin}/#url=https://metapages.org/metapages/dynamic-plot/metapage.json`
+			: null;
 
 		return (
             <div class="siimple-card">

@@ -134,12 +134,16 @@ export default class MetapageApp extends Component {
 	};
 
 	componentDidMount() {
-		window.onhashchange = this.load;
+		if (typeof window !== "undefined") {
+			window.onhashchange = this.load;
+		}
 		this.load();
 	}
 
 	componentWillUnmount() {
-		window.onhashchange = null;
+		if (typeof window !== "undefined") {
+			window.onhashchange = null;
+		}
 	}
 
 	load = async () => {
@@ -267,6 +271,10 @@ export default class MetapageApp extends Component {
     }
 
 	setMetapageJsonBase64 = () => {
+		// preact pre-rendering with node
+		if (typeof window === "undefined") {
+			return;
+		}
 		const metapageJsonString = document.getElementById("text:metapage.json").value;
 		setHashParameter('base64', btoa(metapageJsonString));
 		this.load();        

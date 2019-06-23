@@ -71,11 +71,15 @@ export default class Header extends Component {
 			} else {
 				// what should I use as the short link name?
 				// the last part of the url
-				const url = new URL(pluginId);
-				if (url.pathname.length > 1) {
-					return url.pathname.split('/')[url.pathname.split('/').length - 1];
-				} else { // no path, then just the domain
-					return url.host.replace('www.', '');
+				if (typeof window !== "undefined") {
+					const url = new URL(pluginId);
+					if (url.pathname.length > 1) {
+						return url.pathname.split('/')[url.pathname.split('/').length - 1];
+					} else { // no path, then just the domain
+						return url.host.replace('www.', '');
+					}
+				} else {
+					return null;
 				}
 			}
 		})
