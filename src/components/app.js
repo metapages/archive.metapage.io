@@ -209,6 +209,9 @@ export default class MetapageApp extends Component {
 			newState.metapageDefinition = metapageDefinition;
 			try {
 				newState.metapage = Metapage.from(metapageDefinition);
+				if (newState.metapage.setDebugFromUrlParams) {
+					newState.metapage.setDebugFromUrlParams();
+				}
 			} catch(err) {
 				newState.loadResult.alert = { level: 'error', message: `Failed to create a matapage from the definition: ${err}` };
 			}

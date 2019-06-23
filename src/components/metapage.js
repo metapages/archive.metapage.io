@@ -75,6 +75,7 @@ const generateDefaultLayout = (metapage) => {
  */
 const getFlexboxRowElementMetaframe = (params) => {
 	var {rowElement, metaframes, defaultRowStyle} = params;
+	defaultRowStyle = defaultRowStyle ? defaultRowStyle : {};
 	const metaframeId = rowElement.name;
 	const colClass = rowElement.width ? rowElement.width : 'col-xs';
 	const itemStyle = rowElement.style ? rowElement.style : defaultRowStyle;
