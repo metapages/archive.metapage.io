@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { Component, h } from 'preact';
+
 import Metaframe from './metaframe';
 
 const getLayout = (metapageDefinition, layoutName) => {
@@ -74,8 +75,21 @@ const generateDefaultLayout = (metapage) => {
  */
 const getFlexboxRowElementMetaframe = (params) => {
 	var {rowElement, metaframes, defaultRowStyle} = params;
+	if (!metaframes) {
+		return <div class="siimple-alert siimple-alert--error">
+			Missing metaframes parameter
+		</div>;
+	}
+
 	defaultRowStyle = defaultRowStyle ? defaultRowStyle : {};
 	const metaframeId = rowElement.name;
+
+	if (!metaframes[metaframeId]) {
+		return <div class="siimple-alert siimple-alert--error">
+			Missing metaframe: {metaframeId}
+		</div>;
+	}
+
 	const colClass = rowElement.width ? rowElement.width : 'col-xs';
 	const itemStyle = rowElement.style ? rowElement.style : defaultRowStyle;
 	const classes = `siimple-card ${colClass}`;
