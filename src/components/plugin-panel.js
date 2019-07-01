@@ -5,8 +5,20 @@ import Metaframe from './metaframe';
 // props: metapage, definition
 export class PluginPanel extends Component {
 
-    render({metapage, definition, selected}) {
+    state = {
+		definition: null,
+	}
 
+    componentDidMount() {
+		if (this.props.metapage) {
+            const metapage = this.props.metapage;
+			metapage.on('definition', (definition) => {
+				this.setState({definition});
+			});
+		}
+    }
+
+    render({metapage, selected}) {
         const pluginUrls = metapage.getPluginIds();
         const plugins = pluginUrls.map((url, index) => {
             const styleHidden = index == selected ? {maxHeight:"300px", height:"300px", display:""} : {display:'none'};

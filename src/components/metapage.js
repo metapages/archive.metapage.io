@@ -27,8 +27,7 @@ const getLayout = (metapageDefinition, layoutName) => {
     }
  */
 const generateDefaultLayout = (metapage) => {
-	const metaframes = metapage.getMetaframes();
-	const metaframeIds = Object.keys(metaframes);
+	const metaframeIds = metapage.getMetaframeIds();
 	let columns = 2;
 	if (metaframeIds.length < 2) {
 		columns = 1;
@@ -147,12 +146,24 @@ const applyLayout = (name, layout, metapage) => {
 }
 
 export default class ViewMetapage extends Component {
+
+	componentDidMount() {
+		// load the plugin definitions (async) so we can show
+		// the plugin names
+
+		if (this.props.metapage) {
+			const metapage = this.props.metapage;
+			metapage.on('definition', ({definition}) => {
+				this.setState({ definition });
+			});
+		} else {
+			this.setState({definition: null}); // means loaded
+		}
+	}
 	
-	render(props) {
-		const metapage = props.metapage;
-		const definition = props.definition;
+	render({metapage}, {definition}) {
 		if (!definition) {
-			console.error('NO DEFINITION IN ViewMetapage');
+			return null;
 		}
 		if (!metapage) {
 			return null;

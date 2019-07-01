@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { PluginPanel } from './plugin-panel';
 
-const RequiredProps = ['definition', 'metapage'];
+const RequiredProps = ['metapage'];
 
 const getMetapageName = ({definition, url}) => {
 	const meta = definition ? definition.meta : null;
@@ -28,19 +28,24 @@ export default class Header extends Component {
 		// load the plugin definitions (async) so we can show
 		// the plugin names
 
-		if (this.props.metapage && this.props.definition && this.props.definition.plugins) {
-			const pluginDefinitions = {};
+		if (this.props.metapage) {
 			const metapage = this.props.metapage;
-			const promises = metapage.getPluginIds().map((url) => {
-				return metapage.getPlugin(url).getDefinition()
-					.then((metaframeDefinition) => {
-						pluginDefinitions[url] = metaframeDefinition;
+			metapage.on('definition', () => {
+				const pluginDefinitions = {};
+				const promises = metapage.getPluginIds().map((url) => {
+					return metapage.getPlugin(url).getDefinition()
+						.then((metaframeDefinition) => {
+							pluginDefinitions[url] = metaframeDefinition;
+						});
+				});
+				Promise.all(promises)
+					.then(() => {
+						this.setState({
+							pluginDefinitions,
+							selectedIndex: Math.min(this.state.selectedIndex, Object.keys(pluginDefinitions).length - 1),
+						});
 					});
 			});
-			Promise.all(promises)
-				.then(() => {
-					this.setState({pluginDefinitions});
-				});
 		} else {
 			this.setState({pluginDefinitions:{}}); // means loaded
 		}
@@ -111,7 +116,16 @@ export default class Header extends Component {
 			}
 		}
 
-		const tabs = this.getPluginTabs();
+		const url = new URL(window.location.href);
+		const isPluginsDisabled = url.searchParams.get('header') == '0' || url.searchParams.get('header') == 0;
+
+		const pluginPanel = isPluginsDisabled
+			? null
+			: <PluginPanel selected={this.state.selectedIndex} metapage={props.metapage} />;
+
+		const tabs = isPluginsDisabled
+			? null
+			: this.getPluginTabs();
 
 		return (
 			<div>
@@ -120,7 +134,7 @@ export default class Header extends Component {
 					{tabs}					
 				</div>
 				<div>
-					<PluginPanel selected={this.state.selectedIndex} metapage={props.metapage} definition={props.definition} />
+					{pluginPanel}
 				</div>
 			</div>
 		);

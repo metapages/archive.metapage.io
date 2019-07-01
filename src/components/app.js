@@ -206,12 +206,19 @@ export default class MetapageApp extends Component {
 		} else if (!metapageDefinition) {
 			newState.loadResult.alert = { level: 'error', message: 'No metapage definition found'};
 		} else {
-			newState.metapageDefinition = metapageDefinition;
+			// newState.metapageDefinition = metapageDefinition;
 			try {
 				newState.metapage = Metapage.from(metapageDefinition);
 				if (newState.metapage.setDebugFromUrlParams) {
 					newState.metapage.setDebugFromUrlParams();
 				}
+
+				// newState.metapage.on('definition', () => {
+				// 	this.setState({
+				// 		metapage: newState.metapage,
+				// 		metapageDefinition: newState.metapage.getDefinition(),
+				// 	});
+				// });
 			} catch(err) {
 				newState.loadResult.alert = { level: 'error', message: `Failed to create a matapage from the definition: ${err}` };
 			}
@@ -389,12 +396,12 @@ export default class MetapageApp extends Component {
 	renderMetapage = () => {
 		const metapage = this.state.metapage;
 		const metapageDefinition = this.state.metapageDefinition;
-
-		const header = this.state.params['header'] == '0' ? null : <Header definition={metapageDefinition} metapage={metapage} url={this.state.url} />;
+		// definition={metapageDefinition}
+		const header = this.state.params['header'] == '0' ? null : <Header metapage={metapage} url={this.state.url} />;
 		return (
 			<div id="app">
 				{header}
-				<MetapageView definition={metapageDefinition} metapage={metapage} setHashParameter={setHashParameter} />
+				<MetapageView metapage={metapage} setHashParameter={setHashParameter} />
 			</div>
 		);
 	}
