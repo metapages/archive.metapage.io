@@ -92,29 +92,8 @@ const setHashParameter = (key, val) => {
 		tokens.push(`${key}=${val}`);
 	}
 	tokens = tokens.filter(token => token.length > 1);
-
-	// if (history.replaceState) {
-	// 	history.replaceState(null, null, `#${tokens.join('&')}`);
-	// }
-	// else {
-		location.hash = `#${tokens.join('&')}`;
-	// }
-
-
-	// document.location.hash = tokens.join('&');
+	location.hash = `#${tokens.join('&')}`;
 }
-
-// const removeHashParameter = (key) => {
-// 	let hash = document.location.hash;
-// 	if (hash.startsWith('#')) {
-// 		hash = hash.substr(1);
-// 	}
-// 	let tokens = hash.split('&').filter((token) => {
-// 		const keyVal = token.split('=');
-// 		return keyVal[0] != key;
-// 	});
-// 	document.location.hash = tokens.join('&');
-// }
 
 const getHashParameters = () => {
 	const hashParams = {};
@@ -131,30 +110,6 @@ const getHashParameters = () => {
 	return hashParams;
 }
 
-// const getHashParameters = () => {
-// 	const hash = document.location.hash;
-// 	// console.log('hash', hash);
-// 	if (hash.length < 3) {
-// 		//TODO set state to mean the page is empty, and probably show the docs
-// 		return null;
-// 	}
-// 	const tokens = hash.substr(1).split('&');
-// 	const hashParams = {};
-// 	tokens.forEach((token) => {
-// 		const keyVal = token.split('=');
-// 		hashParams[keyVal[0]] = keyVal[1] || true;
-// 	});
-// 	return hashParams;
-// }
-
-// const setHashParamUrl = (url) => {
-// 	setHashParameter('url', url);
-// }
-
-// const setUrl = (url) => {
-// 	setHashParameter('url', url);
-// }
-
 export default class MetapageApp extends Component {
 
 	state = {
@@ -168,33 +123,20 @@ export default class MetapageApp extends Component {
 	};
 
 	componentDidMount() {
-		// window.onhashchange = this.onHashChange;
-		// this.onHashChange();
 		window.addEventListener('hashchange', this.load);
 		this.load();
 	}
 
 	componentWillUnmount() {
-		console.log('componentWillUnmount');
 		window.removeEventListener('hashchange', this.load)
 	}
 
-	// onHashChange = () => {
-	// 	console.log('onHashChange');
-	// 	// this.setState({
-
-	// 	// });
-	// 	this.load();
-	// }
-
 	load = async () => {
-		console.log('onhashchange')
 		if (this.state.metapage) {
 			this.state.metapage.dispose();
 		}
 
 		const hashParams = getHashParameters();
-		console.log('hashParams', hashParams);
 
 		// Only one hash param allowed, otherwise what to do?
 		const moreThanOneParam = hashParams && hashParams['url'] && hashParams['base64'];
