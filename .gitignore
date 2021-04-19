@@ -1,10 +1,8 @@
 *.map
 *.pyc
 node_modules
-*.sublime-workspace
 tmp
 npm-debug.log
-.haxelib
 .bundle
 .idea
 .aws
@@ -17,3 +15,9 @@ build
 # Normally .npmrc files are tracked, but we're only using ours
 # to store the token for CI
 .npmrc
+
+# I don't know why this file is now being produced
+size-plugin.json
+
+# Ignore VSCode project settings
+*.code-workspace

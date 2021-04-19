@@ -24,7 +24,7 @@ build:
 	cp src/CNAME build/
 	sed -i -e 's#href="/#href="#g' build/index.html
 	sed -i -e 's#src="/#src="#g' build/index.html
-	sed -i -e 's#/assets#assets#g' build/sw.js
+	# sed -i -e 's#/assets#assets#g' build/sw.js
 	sed -i -e 's#/assets#assets#g' build/manifest.json
 
 # [src] change -> build artifact to {{FINAL_BUILD_TARGET}}

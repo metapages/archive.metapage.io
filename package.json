@@ -26,16 +26,32 @@
     "eslint-config-synacor": "^2.0.2",
     "identity-obj-proxy": "^3.0.0",
     "per-env": "^1.0.2",
-    "preact-cli": "^2.1.0",
-    "preact-cli-plugin-async": "^2.0.0",
+    "preact-cli": "^3.0.5",
     "preact-render-spy": "^1.2.1"
   },
   "dependencies": {
     "@metapages/metapage": "^0.5.4",
     "flexboxgrid": "^6.3.1",
-    "gh-pages": "^2.0.1",
-    "preact": "^8.2.6",
-    "preact-compat": "^3.17.0",
+    "gh-pages": "^3.1.0",
+    "preact": "^10.5.13",
     "siimple": "^3.3.1"
+  },
+  "browserslist": {
+    "production": [
+      "last 3 and_chr versions",
+      "last 3 chrome versions",
+      "last 3 opera versions",
+      "last 3 ios_saf versions",
+      "last 3 safari versions"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom": "preact/compat"
   }
 }
