@@ -40,6 +40,7 @@ export default class HelpCard extends Component {
         try {
             // try to parse the JSON string
             JSON.parse(metapageJsonString);
+            console.log('HelpCard this.props.setHashParameter', this.props.setHashParameter)
             this.props.setHashParameter('base64', btoa(encodeURIComponent(metapageJsonString)));
         } catch(err) {
             // do something fancier there
@@ -63,8 +64,8 @@ export default class HelpCard extends Component {
         ]
         .map((url) => `${typeof window !== "undefined" ? window.location.origin : ""}/#url=${url}`)
         .map((url) => <div class="siimple-list-item"><a href={url} class="siimple-link">{url}</a></div>);
-        
-        
+
+
         // <div class="siimple-btn" onClick={() => {props.setHashParameter('url', exampleUrl)}} >{exampleUrl}</div>);
 
 
@@ -79,13 +80,13 @@ export default class HelpCard extends Component {
                 <div class="siimple-card-header">
                     <a href="https://metapages.org/" class="siimple-link">Metapage</a> viewer
                 </div>
-                
-                <div class="siimple-card-body">  
+
+                <div class="siimple-card-body">
                     Provide a <a href="https://metapages.org/api/#metapagedefinition" class="siimple-link">metapage definition</a> and this app will build the application. The definition can be provided in the URL hash parameters one of two ways::
                 </div>
 
                 <div class="siimple-card">
-                    
+
                     <div class="siimple-card-body">
                     <label class="siimple-label">(<code class="siimple-code">#url=?</code>) pointing to the location of the metapage.json, e.g.:</label><br/>
                         <a href={urlExampleMetapageJsonAsHash} class="siimple-link">{urlExampleMetapageJsonAsHash}</a>

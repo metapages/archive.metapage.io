@@ -35,17 +35,16 @@ watch:
 publish: build
 	npm run deploy
 
-# Upgrade metapage/metaframe packages to the latest versions
+# Upgrade @metapages/metapage packages to the latest versions
 upgrade:
-	npm i --save metapage@latest
-	npm i --save metaframe@latest
+	npm i --save @metapages/metapage@latest
 
 # Set the metapage npm package location to a local directory (requires $METAPAGE_BUILD_DIR)
 dev-set-local-metapage-lib:
-	sed -i "s#\"metapage\":.*#\"metapage\": \"file:$METAPAGE_BUILD_DIR\",#g" package.json
+	sed -i "s#\"@metapages/metapage\":.*#\"@metapages/metapage\": \"file:$METAPAGE_BUILD_DIR\",#g" package.json
 
 dev-set-local-metapage-lib-undo:
-	sed -i "s#\"metapage\":.*#\"metapage\": \"`npm show metapage version`\",#g" package.json
+	sed -i "s#\"@metapages/metapage\":.*#\"@metapages/metapage\": \"`npm show @metapages/metapage version`\",#g" package.json
 
 # CLI shell in the docker container
 docker-cli:
