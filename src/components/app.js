@@ -11,7 +11,7 @@
  */
 
 import { h, Component } from 'preact';
-import { Metapage } from '@metapages/metapage';
+import { Metapage, pageLoaded } from '@metapages/metapage';
 import Header from './header';
 // import HelpCard from './help';
 import Alert from './alert';
@@ -135,6 +135,8 @@ export default class MetapageApp extends Component {
 		if (this.state.metapage) {
 			this.state.metapage.dispose();
 		}
+
+		await pageLoaded();
 
 		const hashParams = getHashParameters();
 
