@@ -36,12 +36,10 @@ export default class HelpCard extends Component {
 			return;
         }
         const metapageJsonString = typeof window !== "undefined" ? window.document.getElementById("text:metapage.json").value : null;
-        console.log(metapageJsonString);
         try {
             // try to parse the JSON string
             JSON.parse(metapageJsonString);
-            console.log('HelpCard this.props.setHashParameter', this.props.setHashParameter)
-            this.props.setHashParameter('base64', btoa(encodeURIComponent(metapageJsonString)));
+            this.props.setHashParameter('definition', btoa(encodeURIComponent(metapageJsonString)));
         } catch(err) {
             // do something fancier there
             this.props.setState({
@@ -95,7 +93,7 @@ export default class HelpCard extends Component {
 
                 <div class="siimple-card">
                     <div class="siimple-card-body">
-                        <label class="siimple-label">(<code class="siimple-code">#base64=?</code>) containing the base64 encoded metapage JSON:</label><br/>
+                        <label class="siimple-label">(<code class="siimple-code">#definition=?</code>) containing the base64 encoded metapage JSON:</label><br/>
                         <textarea id="text:metapage.json" class="siimple-textarea siimple-textarea--fluid" rows="5" onKeyDown={this.onKeyDown}>
                         {exampleJson}
                         </textarea>

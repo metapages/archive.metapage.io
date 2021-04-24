@@ -1,54 +1,84 @@
 # https://github.com/casey/just
 
-NODE_ENV := 'development'
-PORT := env_var_or_default("PORT", "4010")
+set shell := ["bash", "-c"]
 
-# If we're not running in a docker container
-_first:
-	just --list
+# E.g. 'my.app.com'. Some services e.g. auth need know the external endpoint for example OAuth
+# The root domain for this app, serving index.html
+export APP_FQDN                    := env_var_or_default("APP_FQDN", "metaframe1.dev")
+export APP_PORT                    := env_var_or_default("APP_PORT", "443")
+# browser hot-module-replacement (live reloading)
+export PORT_HMR                    := env_var_or_default("PORT_HMR", "3456")
+# see https://github.com/parcel-bundler/parcel/issues/2031
+PARCEL_WORKERS                     := env_var_or_default("PARCEL_WORKERS", `if [ -f /.dockerenv ]; then echo "1" ; fi`)
+parcel                             := "PARCEL_WORKERS=" + PARCEL_WORKERS +  " node_modules/parcel-bundler/bin/cli.js"
+# minimal formatting, bold is very useful
+bold     := '\033[1m'
+normal   := '\033[0m'
 
-help:
-    @just --list
+@_help:
+	just --list --unsorted --list-heading $'🚪 Commands:\n\n'
 
-# Run the stack. Actually easier to just serve but whatever
-run:
-    docker-compose up --remove-orphans
-
-# serve and build on [src] change
-serve:
-    npm run dev
-
-# build artifact to {{FINAL_BUILD_TARGET}}
-build:
-	npm run build
-	cp src/CNAME build/
-	sed -i -e 's#href="/#href="#g' build/index.html
-	sed -i -e 's#src="/#src="#g' build/index.html
-	# sed -i -e 's#/assets#assets#g' build/sw.js
-	sed -i -e 's#/assets#assets#g' build/manifest.json
-
-# [src] change -> build artifact to {{FINAL_BUILD_TARGET}}
-watch:
-    nodemon --watch src --exec just build
+# Run the browser dev server
+dev: _ensure_npm_modules _mkcert
+    #!/usr/bin/env bash
+    # Running inside docker requires modified startup configuration, HMR and HTTPS are disabled
+    if [ -f /.dockerenv ]; then
+        echo "💥 Missing feature: parcel (builds browser assets) cannot be run in development mode in a docker container"
+        {{parcel}} serve \
+                        --port ${APP_PORT} \
+                        --host 0.0.0.0 \
+                        --no-hmr \
+                        public/index.html
+    else
+        APP_ORIGIN=https://${APP_FQDN}:${APP_PORT}
+        echo "Browser development pointing to: ${APP_ORIGIN}"
+        {{parcel}} serve \
+                        --cert .certs/${APP_FQDN}.pem \
+                        --key  .certs/${APP_FQDN}-key.pem \
+                        --port ${APP_PORT} \
+                        --host ${APP_FQDN} \
+                        --hmr-port ${PORT_HMR} \
+                        public/index.html --open
+    fi
 
 # deploy to gh-pages branch
 publish: build
 	npm run deploy
 
-# Upgrade @metapages/metapage packages to the latest versions
-upgrade:
-	npm i --save @metapages/metapage@latest
+# Build the npm module
+build: _ensure_npm_modules
+	rm -rf dist/*
+	{{parcel}} build 'public/index.html' --public-url ./ --no-autoinstall --detailed-report 50
+	cp src/CNAME dist/
 
-# Set the metapage npm package location to a local directory (requires $METAPAGE_BUILD_DIR)
-dev-set-local-metapage-lib:
-	sed -i "s#\"@metapages/metapage\":.*#\"@metapages/metapage\": \"file:$METAPAGE_BUILD_DIR\",#g" package.json
+# rebuild the npm module on changes, but do not serve
+watch:
+    watchexec --restart --watch ./src --watch ./justfile --watch ./package.json -- bash -c '{{parcel}} watch --public-url ./ public/index.html'
 
-dev-set-local-metapage-lib-undo:
-	sed -i "s#\"@metapages/metapage\":.*#\"@metapages/metapage\": \"`npm show @metapages/metapage version`\",#g" package.json
+_mkcert:
+    #!/usr/bin/env bash
+    echo -e "🚪 Check local mkcert certificates and /etc/hosts with APP_FQDN=${APP_FQDN}"
+    if [ -n "$CI" ]; then
+        echo "CI=$CI ∴ skipping mkcert"
+        exit 0
+    fi
+    if [ -f /.dockerenv ]; then \
+        echo "Inside docker context, assuming mkcert has been run on the host"
+        exit 0;
+    fi
+    if ! command -v mkcert &> /dev/null; then echo "💥 {{bold}}mkcert{{normal}}💥 is not installed (manual.md#host-requirements): https://github.com/FiloSottile/mkcert"; exit 1; fi
+    if [ ! -f .certs/{{APP_FQDN}}-key.pem ]; then
+        mkdir -p .certs/ ;
+        cd .certs/ && mkcert -cert-file {{APP_FQDN}}.pem -key-file {{APP_FQDN}}-key.pem {{APP_FQDN}} localhost ;
+    fi
+    if ! cat /etc/hosts | grep "{{APP_FQDN}}" &> /dev/null; then
+        echo -e "";
+        echo -e "💥Add to /etc/hosts: 'sudo vi /etc/hosts'💥";
+        echo -e "";
+        echo -e "      {{bold}}127.0.0.1     {{APP_FQDN}}{{normal}}";
+        echo -e "";
+        exit 1;
+    fi
 
-# CLI shell in the docker container
-docker-cli:
-	just _get-in-docker
-
-_get-in-docker:
-	docker-compose run --rm -p '4010:{{PORT}}' metapage-app /bin/sh
+@_ensure_npm_modules:
+    if [ ! -f "{{parcel}}" ]; then npm i; fi

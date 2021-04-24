@@ -1,6 +1,7 @@
 import './style/iframes';
 import 'siimple';
 import 'flexboxgrid';
-import MetapageApp from './components/app';
+import { h, render } from "preact";
+import { App } from './components/app';
 
-export default MetapageApp;
+render(<App />, document.getElementById("root"));

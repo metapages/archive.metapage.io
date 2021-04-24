@@ -1,23 +1,12 @@
-*.map
-*.pyc
-node_modules
-tmp
-npm-debug.log
-.bundle
-.idea
-.aws
+# local mkcert generated certificates for https
+.certs
+# never commit this
 .env
-gitcache
-_site
-.sass-cache
-build
-
-# Normally .npmrc files are tracked, but we're only using ours
-# to store the token for CI
-.npmrc
-
-# I don't know why this file is now being produced
-size-plugin.json
-
-# Ignore VSCode project settings
-*.code-workspace
+# parcel
+.cache
+# I'd like to commit this but probably not a good idea
+.vscode
+# compiled website
+dist
+# dependencies
+node_modules

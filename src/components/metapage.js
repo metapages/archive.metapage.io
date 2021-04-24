@@ -1,6 +1,7 @@
 import { Component, h } from 'preact';
-
+import { MetapageEvents } from '@metapages/metapage';
 import Metaframe from './metaframe';
+import { setMetapageDefinitionInHashParam } from './util';
 
 const getLayout = (metapageDefinition, layoutName) => {
 	if (metapageDefinition == null || metapageDefinition.meta == null || metapageDefinition.meta.layouts == null) {
@@ -53,8 +54,8 @@ const generateDefaultLayout = (metapage) => {
 
 /**
  * Generate the virtual dom of the layed out metaframes
- * @param {*} layout 
- * @param {*} metapage 
+ * @param {*} layout
+ * @param {*} metapage
  *    "meta": {
  *      "plugins": [],
  *      "layouts": {
@@ -95,7 +96,7 @@ const getFlexboxRowElementMetaframe = (params) => {
 	const classes = `siimple-card ${colClass}`;
 	const header = <div class="siimple-card-header">{metaframeId}</div>;
 	const id = `siimple-card-${metaframeId}`;
-	
+
 	itemStyle['overflowY'] = 'hidden';
 	const metaframeContainer = <div class="siimple-card-body siimple--mx-0 siimple--my-0 siimple--px-0 siimple--py-0" style={itemStyle}  >
 		<Metaframe id={metaframeId} iframe={metaframes[metaframeId].iframe} style={itemStyle} />
@@ -136,7 +137,7 @@ const getFlexboxRowElement = (params) => {
 const applyLayout = (name, layout, metapage) => {
 	name = name ? name : 'flexboxgrid';
 	const metaframes = metapage.metaframes();
-	
+
 	switch(name) {
 		case 'flexboxgrid':
 			// TODO process version when needed
@@ -159,7 +160,7 @@ const applyLayout = (name, layout, metapage) => {
 	}
 }
 
-export default class ViewMetapage extends Component {
+export default class MetapageView extends Component {
 
 	componentDidMount() {
 		// load the plugin definitions (async) so we can show
@@ -167,14 +168,17 @@ export default class ViewMetapage extends Component {
 
 		if (this.props.metapage) {
 			const metapage = this.props.metapage;
-			metapage.on('definition', ({definition}) => {
+			metapage.on(MetapageEvents.Definition, ({definition}) => {
 				this.setState({ definition });
+				// if a plugin modifies the definition, update the hash param that is the source of truth
+				setMetapageDefinitionInHashParam(definition);
 			});
 		} else {
 			this.setState({definition: null}); // means loaded
 		}
 	}
-	
+
+	// render(props, state)
 	render({metapage}, {definition}) {
 		if (!definition) {
 			return null;
@@ -190,7 +194,7 @@ export default class ViewMetapage extends Component {
 		}
 
 		var metaframesArranged = applyLayout(layoutName, layout, metapage)
-		
+
 		return (
 			<div class="siimple-grid">
                 {metaframesArranged}
