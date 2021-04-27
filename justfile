@@ -11,6 +11,7 @@ export PORT_HMR                    := env_var_or_default("PORT_HMR", "3456")
 # see https://github.com/parcel-bundler/parcel/issues/2031
 PARCEL_WORKERS                     := env_var_or_default("PARCEL_WORKERS", `if [ -f /.dockerenv ]; then echo "1" ; fi`)
 parcel                             := "PARCEL_WORKERS=" + PARCEL_WORKERS +  " node_modules/parcel-bundler/bin/cli.js"
+tsc                                := "./node_modules/typescript/bin/tsc"
 # minimal formatting, bold is very useful
 bold     := '\033[1m'
 normal   := '\033[0m'
@@ -19,7 +20,7 @@ normal   := '\033[0m'
 	just --list --unsorted --list-heading $'🚪 Commands:\n\n'
 
 # Run the browser dev server
-dev: _ensure_npm_modules _mkcert
+dev: _ensure_npm_modules _mkcert (_tsc "--build --verbose")
     #!/usr/bin/env bash
     # Running inside docker requires modified startup configuration, HMR and HTTPS are disabled
     if [ -f /.dockerenv ]; then
@@ -46,14 +47,23 @@ publish: build
 	npm run deploy
 
 # Build the npm module
-build: _ensure_npm_modules
+build: _ensure_npm_modules (_tsc "--build --verbose")
 	rm -rf dist/*
 	{{parcel}} build 'public/index.html' --public-url ./ --no-autoinstall --detailed-report 50
 	cp src/CNAME dist/
 
-# rebuild the npm module on changes, but do not serve
+# rebuild the client on changes, but do not serve
 watch:
-    watchexec --restart --watch ./src --watch ./justfile --watch ./package.json -- bash -c '{{parcel}} watch --public-url ./ public/index.html'
+    @# ts-node-dev does not work with typescript project references https://github.com/TypeStrong/ts-node/issues/897
+    watchexec --restart --watch ./src --watch ./justfile --watch ./package.json --watch ./tsconfig.json -- bash -c '{{tsc}} --build --verbose && {{parcel}} watch --public-url ./ public/index.html'
+
+# deletes .cache .parcel-cache .certs dist
+clean:
+    rm -rf .cache .parcel-cache .certs dist
+
+# compile typescript src, may or may not emit artifacts
+_tsc +args="":
+    {{tsc}} {{args}}
 
 _mkcert:
     #!/usr/bin/env bash
