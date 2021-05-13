@@ -209,8 +209,7 @@ const exampleJson = JSON.stringify(
         ],
       },
     },
-    // plugins: ["https://metapages.github.io/metaframe-editor/"],
-    plugins: ["https://metaframe-editor.dev:4430/"],
+    plugins: ["https://metapages.github.io/metaframe-editor/"],
   },
   null,
   "  "
