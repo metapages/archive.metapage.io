@@ -1,14 +1,23 @@
 {
   "private": false,
   "name": "metapage-app",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "homepage": "https://app.metapages.org/",
+  "repository": "https://github.com/metapages/metapage-app",
   "license": "MIT",
   "scripts": {
     "deploy": "gh-pages -d dist"
   },
+  "staticFiles": {
+    "staticPath": [
+      {
+        "staticPath": "static"
+      }
+    ]
+  },
   "devDependencies": {
     "@types/node": "^12.20.10",
+    "@types/object-hash": "^2.1.0",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "@types/react-router-dom": "^5.1.7",
@@ -16,8 +25,10 @@
     "parcel-bundler": "^1.12.5"
   },
   "dependencies": {
-    "@metapages/metapage": "^0.5.9",
+    "@metapages/metaframe-hook": "^0.2.9",
+    "@metapages/metapage": "^0.5.12",
     "flexboxgrid": "^6.3.1",
+    "object-hash": "^2.1.1",
     "parcel-plugin-static-files-copy": "^2.6.0",
     "preact": "^10.5.13",
     "siimple": "^3.3.1",

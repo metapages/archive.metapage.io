@@ -1,14 +1,11 @@
 import { h, FunctionalComponent } from "preact";
-import { useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import {
   Metapage,
-  MetapageEvents,
-  MetapageDefinition,
   MetapageIFrameRpcClient,
-  MetapageEventDefinition,
+
 } from "@metapages/metapage";
 import { MetaframeView } from "./MetaframeView";
-import { useHashParamJson } from "../hooks/useHashParamJson";
 import {
   LayoutName as LayoutFlexBoxGridName,
   LayoutFlexBoxGridElement,
@@ -16,6 +13,40 @@ import {
   MetapageLayoutGrid,
   generateDefaultLayout,
 } from "./LayoutGrid";
+
+// For now, we only support one type of layout, bake it in here
+// In the future we might support many
+const layoutName = LayoutFlexBoxGridName;
+
+export const MetapageView: FunctionalComponent<{
+  metapage: Metapage;
+  // metapageDefinition:MetapageDefinition;
+}> = ({ metapage }) => {
+
+  if (!metapage) {
+    return null;
+  }
+
+  // const [layout, setLayout] = useState<MetapageLayoutGrid | undefined>(undefined);
+  const [ metaframesArranged, setMetaframesArranged] = useState<h.JSX.Element[]>([])
+
+  useEffect(() => {
+    let layout: MetapageLayoutGrid | undefined = getLayout(
+      metapage.getDefinition()
+    );
+    if (!layout) {
+      layout = generateDefaultLayout(metapage);
+    }
+    // setLayout(newlayout);
+    setMetaframesArranged(applyLayout(layoutName, layout, metapage))
+  }, [metapage, setMetaframesArranged]);
+
+  // useEffect
+
+  console.log(`🐢  MetapageView.render ${metapage._id}`)
+  return <div class="siimple-grid">{metaframesArranged}</div>;
+};
+
 
 /**
  * Generate the virtual dom of the layed out metaframes
@@ -148,44 +179,4 @@ const applyLayout = (
     default:
       throw `Unknown layout: ${name}`;
   }
-};
-
-export const MetapageView: FunctionalComponent<{
-  metapage: Metapage;
-  // metapageDefinition:MetapageDefinition;
-}> = ({ metapage }) => {
-  const [_, setMetapageDefinitionBase64] = useHashParamJson<
-    MetapageDefinition | undefined
-  >("definition");
-
-  useEffect(() => {
-    let listener: (e: MetapageEventDefinition) => void;
-    if (metapage) {
-      listener = (e: MetapageEventDefinition) => {
-        // if a plugin modifies the definition, update the hash param that is the source of truth
-        setMetapageDefinitionBase64(e.definition);
-      };
-      metapage.addListener(MetapageEvents.Definition, listener);
-    }
-    return () => {
-      if (metapage) {
-        metapage.removeListener(MetapageEvents.Definition, listener);
-      }
-    };
-  }, [metapage, setMetapageDefinitionBase64]);
-
-  if (!metapage) {
-    return null;
-  }
-  let layoutName = LayoutFlexBoxGridName;
-  let layout: MetapageLayoutGrid | undefined = getLayout(
-    metapage.getDefinition()
-  );
-  if (!layout) {
-    layout = generateDefaultLayout(metapage);
-  }
-
-  var metaframesArranged = applyLayout(layoutName, layout, metapage);
-
-  return <div class="siimple-grid">{metaframesArranged}</div>;
 };

@@ -12,132 +12,22 @@
 
 import { h, FunctionalComponent } from "preact";
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { Metapage } from "@metapages/metapage";
+import { Metapage, MetapageEvents, MetapageDefinition } from "@metapages/metapage";
 import { Header } from "./Header";
 import { Alert } from "./Alert";
 import { MetapageView } from "./MetapageView";
-import { MetapageDefinition } from "@metapages/metapage/metapage/v0_2/all";
-import { useHashParamJson } from "../hooks/useHashParamJson";
+import { useHashParamJson } from "@metapages/metaframe-hook";
 import useHashParam from "use-hash-param";
 import { AlertBlob } from "./Alert";
+import {metapageFromUrl } from "../hooks/metapageFromUrlHook";
 
 // change this if developing locally the root site to the demo metapages
 const METAPAGES_ORG = "https://metapages.org/";
 
 export const App: FunctionalComponent = () => {
   const [alert, setAlert] = useState<AlertBlob | undefined>(undefined);
-  const [url, setUrl] = useHashParam("url", undefined as any);
-  const [metapageDefinition, setMetapageDefinition] = useState<
-    MetapageDefinition | undefined
-  >(undefined);
-  const [metapageDefinitionUrl, setMetapageDefinitionUrl] = useState<
-    { definition: MetapageDefinition; url: string } | undefined
-  >(undefined);
-  const [
-    metapageDefinitionBase64,
-    setMetapageDefinitionBase64,
-  ] = useHashParamJson<MetapageDefinition | undefined>("definition");
-  const [metapage, setMetapage] = useState<Metapage | undefined>(undefined);
-
-  // - if there is a *just* a URL hash param: https://app.metapages.org/#url=<url>
-  //   - then use the url definition
-  // - if there is https://app.metapages.org/#definition=<base64>
-  //   - then use the base64 definition
-  //   - if there is a url param also, remove it
-
-  // url => metapageDefinitionUrl
-  useEffect(() => {
-    // bail early maybe, but also clean up
-    if ((!url || url.length === 0) && metapageDefinitionUrl) {
-      setMetapageDefinitionUrl(undefined);
-    }
-
-    if (!url || url.length === 0) {
-      if (typeof url === "string") {
-        setUrl(undefined as any);
-      }
-      return;
-    }
-
-    // if no url or we already have the definition, bail
-    if (metapageDefinitionUrl?.url === url) {
-      return;
-    }
-
-    // load #url=<url>
-    const thisUrl = url;
-    (async () => {
-      try {
-        const definition:
-          | MetapageDefinition
-          | undefined = await getMetapageDefinitionFromUrl(thisUrl);
-        if (!definition) {
-          throw `No MetapageDefinition found at: ${thisUrl}`;
-        }
-        setMetapageDefinitionUrl({ url: thisUrl, definition });
-      } catch (err: any) {
-        console.error(err);
-        setAlert({
-          level: "error",
-          message: `${err}`,
-        });
-        setMetapageDefinitionUrl(undefined);
-      }
-    })();
-  }, [
-    alert,
-    url,
-    metapageDefinitionUrl,
-    setMetapageDefinitionUrl,
-    setAlert,
-    status,
-  ]);
-
-  // if both exist #definition=<base64> #url=<url> then remove #url=<url>
-  useEffect(() => {
-    if (typeof url === "string" && metapageDefinitionBase64) {
-      setUrl(undefined as any);
-    }
-  }, [url, setUrl, metapageDefinitionBase64]);
-
-  // choose the metapage definition or delete it
-  useEffect(() => {
-    // base64 always has priority (and if both, the url param will be removed)
-    const newMetapageDefinition: MetapageDefinition | undefined =
-      metapageDefinitionBase64 || metapageDefinitionUrl?.definition;
-    if (!newMetapageDefinition) {
-      if (metapageDefinition) {
-        setMetapageDefinition(undefined);
-      }
-      return;
-    }
-    if (
-      JSON.stringify(metapageDefinition) !==
-      JSON.stringify(newMetapageDefinition)
-    ) {
-      setMetapageDefinition(newMetapageDefinition);
-    }
-  }, [
-    metapageDefinitionUrl,
-    metapageDefinitionBase64,
-    metapageDefinition,
-    setMetapageDefinition,
-  ]);
-
-  // create or delete metapage from metapageDefinition
-  useEffect(() => {
-    if (!metapageDefinition) {
-      if (metapage) {
-        setMetapage(undefined);
-      }
-      return;
-    }
-    const newMetapage = Metapage.from(metapageDefinition);
-    setMetapage(newMetapage);
-    return () => {
-      newMetapage.dispose();
-    };
-  }, [metapageDefinition, setMetapage]);
+  const [url] = useHashParam("url", undefined as any);
+  const [metapage, setMetapageDefinition] = metapageFromUrl();
 
   const loadMetapageJsonFromTextBox = useCallback(() => {
     const metapageJsonString = (document!.getElementById(
@@ -146,13 +36,13 @@ export const App: FunctionalComponent = () => {
     try {
       // try to parse the JSON string
       const newMetapageBlob = JSON.parse(metapageJsonString);
-      setMetapageDefinitionBase64(newMetapageBlob);
+      setMetapageDefinition(newMetapageBlob);
     } catch (err) {
       // do something fancier there
       console.error(err);
       setAlert({ level: "error", message: `Failed to parse JSON: ${err}` });
     }
-  }, [setMetapageDefinitionBase64, setAlert]);
+  }, [setMetapageDefinition, setAlert]);
 
   const headerDisabled =
     new URL(window.location.href).searchParams.get("header") === "0";
@@ -169,8 +59,8 @@ export const App: FunctionalComponent = () => {
   // if there's a metapage, we don't care about anything else
   if (metapage) {
     const header =
-      headerDisabled || !metapageDefinition ? null : (
-        <Header definition={metapageDefinition} metapage={metapage} url={url} />
+      headerDisabled || !metapage ? null : (
+        <Header metapage={metapage} url={url} />
       );
     return (
       <div id="app">
@@ -319,7 +209,8 @@ const exampleJson = JSON.stringify(
         ],
       },
     },
-    plugins: ["https://metapages.github.io/metaframe-editor/"],
+    // plugins: ["https://metapages.github.io/metaframe-editor/"],
+    plugins: ["https://metaframe-editor.dev:4430/"],
   },
   null,
   "  "

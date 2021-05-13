@@ -19,8 +19,9 @@ normal   := '\033[0m'
 @_help:
 	just --list --unsorted --list-heading $'🚪 Commands:\n\n'
 
+# _ensure_npm_modules
 # Run the browser dev server
-dev: _ensure_npm_modules _mkcert (_tsc "--build --verbose")
+dev: _mkcert (_tsc "--build --verbose")
     #!/usr/bin/env bash
     # Running inside docker requires modified startup configuration, HMR and HTTPS are disabled
     if [ -f /.dockerenv ]; then
@@ -46,8 +47,9 @@ dev: _ensure_npm_modules _mkcert (_tsc "--build --verbose")
 publish: build
 	npm run deploy
 
+# _ensure_npm_modules
 # Build the npm module
-build: _ensure_npm_modules (_tsc "--build --verbose")
+build: (_tsc "--build --verbose")
 	rm -rf dist/*
 	{{parcel}} build 'public/index.html' --public-url ./ --no-autoinstall --detailed-report 50
 	cp src/CNAME dist/

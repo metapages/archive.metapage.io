@@ -11,10 +11,10 @@ import { PluginPanel } from "./PluginPanel";
 type PluginDefinitions = { [key in string]: MetaframeDefinition };
 
 export const Header: FunctionalComponent<{
-  definition: MetapageDefinition;
+  // definition: MetapageDefinition;
   metapage: Metapage;
   url?: string;
-}> = ({ metapage, definition, url }) => {
+}> = ({ metapage, url }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [pluginDefinitions, setPluginDefinitions] = useState<
     PluginDefinitions | undefined
@@ -79,7 +79,7 @@ export const Header: FunctionalComponent<{
         style={{ maxWidth: "100%" }}
       >
         <div class="siimple-navbar-title siimple--float-left siimple--pl-3">
-          {getMetapageName({ definition, url })}
+          {getMetapageName({ definition: metapage ? metapage.getDefinition() : undefined, url })}
         </div>
         {isPluginsDisabled ? null : (
           <div class="siimple-tabs siimple-tabs--boxed">
@@ -136,7 +136,7 @@ export const Header: FunctionalComponent<{
 };
 
 const getMetapageName = (args: {
-  definition: MetapageDefinition;
+  definition: MetapageDefinition | undefined;
   url: string | undefined;
 }) => {
   const { definition, url } = args;
