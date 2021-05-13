@@ -1,10 +1,6 @@
 import { h, FunctionalComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import {
-  Metapage,
-  MetapageIFrameRpcClient,
-
-} from "@metapages/metapage";
+import { Metapage, MetapageIFrameRpcClient } from "@metapages/metapage";
 import { MetaframeView } from "./MetaframeView";
 import {
   LayoutName as LayoutFlexBoxGridName,
@@ -20,15 +16,14 @@ const layoutName = LayoutFlexBoxGridName;
 
 export const MetapageView: FunctionalComponent<{
   metapage: Metapage;
-  // metapageDefinition:MetapageDefinition;
 }> = ({ metapage }) => {
-
   if (!metapage) {
     return null;
   }
 
-  // const [layout, setLayout] = useState<MetapageLayoutGrid | undefined>(undefined);
-  const [ metaframesArranged, setMetaframesArranged] = useState<h.JSX.Element[]>([])
+  const [metaframesArranged, setMetaframesArranged] = useState<h.JSX.Element[]>(
+    []
+  );
 
   useEffect(() => {
     let layout: MetapageLayoutGrid | undefined = getLayout(
@@ -37,16 +32,11 @@ export const MetapageView: FunctionalComponent<{
     if (!layout) {
       layout = generateDefaultLayout(metapage);
     }
-    // setLayout(newlayout);
-    setMetaframesArranged(applyLayout(layoutName, layout, metapage))
+    setMetaframesArranged(applyLayout(layoutName, layout, metapage));
   }, [metapage, setMetaframesArranged]);
 
-  // useEffect
-
-  console.log(`🐢  MetapageView.render ${metapage._id}`)
   return <div class="siimple-grid">{metaframesArranged}</div>;
 };
-
 
 /**
  * Generate the virtual dom of the layed out metaframes
