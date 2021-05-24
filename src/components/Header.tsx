@@ -34,8 +34,10 @@ export const Header: FunctionalComponent<{
             return metapage
               .getPlugin(pluginIdIsUrl)
               .getDefinition()
-              .then((metaframeDefinition: MetaframeDefinition) => {
-                newPluginDefinitions[pluginIdIsUrl] = metaframeDefinition;
+              .then((metaframeDefinition: MetaframeDefinition|undefined) => {
+                if (metaframeDefinition) {
+                  newPluginDefinitions[pluginIdIsUrl] = metaframeDefinition;
+                }
               });
           });
         await Promise.all(promises);
