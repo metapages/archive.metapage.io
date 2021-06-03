@@ -8,10 +8,9 @@ import {
 } from "@metapages/metapage";
 import { PluginPanel } from "./PluginPanel";
 
-type PluginDefinitions = { [key in string]: MetaframeDefinition };
+type PluginDefinitions = { [key in string]: MetaframeDefinition | undefined };
 
 export const Header: FunctionalComponent<{
-  // definition: MetapageDefinition;
   metapage: Metapage;
   url?: string;
 }> = ({ metapage, url }) => {
@@ -83,15 +82,14 @@ export const Header: FunctionalComponent<{
         <div class="siimple-navbar-title siimple--float-left siimple--pl-3">
           {getMetapageName({ definition: metapage ? metapage.getDefinition() : undefined, url })}
         </div>
-        {isPluginsDisabled ? null : (
+        {isPluginsDisabled  || !pluginDefinitions ? null : (
           <div class="siimple-tabs siimple-tabs--boxed">
             {metapage
               .getPluginIds()
               .map((pluginId) => {
-                const pluginMetaframeDefinition = pluginDefinitions![pluginId];
-
+                const pluginMetaframeDefinition :MetaframeDefinition | undefined = pluginDefinitions[pluginId];
                 // TODO process version when needed
-                const pluginMetadata = pluginMetaframeDefinition.metadata;
+                const pluginMetadata = pluginMetaframeDefinition?.metadata;
 
                 if (pluginMetadata && (pluginMetadata as any).name) {
                   return (pluginMetadata as any).name;

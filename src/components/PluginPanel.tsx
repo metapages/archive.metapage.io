@@ -12,16 +12,15 @@ export const PluginPanel: FunctionalComponent<{
   selected: number;
   metapage: Metapage | undefined;
 }> = ({ selected, metapage }) => {
-  const [_, setDefinition] = useState<MetapageDefinition | undefined>(
-    undefined
-  );
+  const [_, setDefinition] =
+    useState<MetapageDefinition | undefined>(undefined);
 
   // TODO put this elsewhere as metapageDefinitionHook
   useEffect(() => {
     if (!metapage) {
       return;
     }
-    const listener = (e:MetapageEventDefinition) => {
+    const listener = (e: MetapageEventDefinition) => {
       setDefinition(e.definition);
     };
     metapage.addListener(MetapageEvents.Definition, listener);
@@ -37,23 +36,29 @@ export const PluginPanel: FunctionalComponent<{
 
   const pluginUrls: string[] = metapage ? metapage.getPluginIds() : [];
   const plugins = pluginUrls.map((url, index) => {
-    const styleHidden =
-      index == selected
-        ? { maxHeight: "300px", height: "300px", display: "" }
-        : { display: "none" };
     const pluginMetaframe = metapage!.getPlugin(url);
+    if (!pluginMetaframe) {
+      return null;
+    }
+    let styleHeight = "80vh";
+
+    const style =
+      index == selected
+        ? { maxHeight: styleHeight, height: styleHeight, display: "" }
+        : { display: "none" };
+
     const metaframeContainer = (
       <div class="siimple-card-body">
         <MetaframeView
           id={url}
           iframe={pluginMetaframe.iframe}
-          style={{ maxHeight: "280px", height: "280px" }}
+          style={{ maxHeight: styleHeight, height: styleHeight }}
         />
       </div>
     );
 
     return (
-      <div class="siimple-card" id={url} style={styleHidden}>
+      <div class="siimple-card" id={url} style={style}>
         {metaframeContainer}
       </div>
     );

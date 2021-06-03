@@ -11,15 +11,16 @@
  */
 
 import { h, FunctionalComponent } from "preact";
-import { useCallback, useEffect, useState } from "preact/hooks";
-import { Metapage, MetapageEvents, MetapageDefinition } from "@metapages/metapage";
+import { useCallback, useState } from "preact/hooks";
+import {
+  MetapageDefinition,
+} from "@metapages/metapage";
 import { Header } from "./Header";
 import { Alert } from "./Alert";
 import { MetapageView } from "./MetapageView";
-import { useHashParamJson } from "@metapages/metaframe-hook";
 import useHashParam from "use-hash-param";
 import { AlertBlob } from "./Alert";
-import {metapageFromUrl } from "../hooks/metapageFromUrlHook";
+import { metapageFromUrl } from "../hooks/metapageFromUrlHook";
 
 // change this if developing locally the root site to the demo metapages
 const METAPAGES_ORG = "https://metapages.org/";
@@ -181,8 +182,7 @@ const exampleJson = JSON.stringify(
                 },
               },
               {
-                url:
-					`${METAPAGES_ORG}metaframes/passthrough-arrow/?rotation=90`,
+                url: `${METAPAGES_ORG}metaframes/passthrough-arrow/?rotation=90`,
                 width: "col-xs-1",
               },
               {
@@ -196,8 +196,7 @@ const exampleJson = JSON.stringify(
     },
     metaframes: {
       "random-data-generator": {
-        url:
-          `${METAPAGES_ORG}metaframes/random-data-generator/?frequency=1000`,
+        url: `${METAPAGES_ORG}metaframes/random-data-generator/?frequency=1000`,
       },
       "graph-dynamic": {
         url: `${METAPAGES_ORG}metaframes/graph-dynamic/`,
@@ -209,7 +208,10 @@ const exampleJson = JSON.stringify(
         ],
       },
     },
-    plugins: ["https://metapages.github.io/metaframe-editor/"],
+    plugins: [
+      "https://metapages.org/metaframes/mermaid.js/?TITLE=0",
+      "https://metapages.github.io/metaframe-editor/"
+    ],
   },
   null,
   "  "
