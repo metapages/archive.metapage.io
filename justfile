@@ -7,7 +7,7 @@ set shell := ["bash", "-c"]
 export APP_FQDN                    := env_var_or_default("APP_FQDN", "metaframe1.dev")
 export APP_PORT                    := env_var_or_default("APP_PORT", "443")
 # browser hot-module-replacement (live reloading)
-export PORT_HMR                    := env_var_or_default("PORT_HMR", "3456")
+export PORT_HMR                    := env_var_or_default("PORT_HMR", "3458")
 # see https://github.com/parcel-bundler/parcel/issues/2031
 PARCEL_WORKERS                     := env_var_or_default("PARCEL_WORKERS", `if [ -f /.dockerenv ]; then echo "1" ; fi`)
 parcel                             := "PARCEL_WORKERS=" + PARCEL_WORKERS +  " node_modules/parcel-bundler/bin/cli.js"
