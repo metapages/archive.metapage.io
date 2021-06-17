@@ -11,7 +11,7 @@
  */
 
 import { h, FunctionalComponent } from "preact";
-import { useCallback, useState } from 'preact/hooks';
+import { useCallback, useState } from "preact/hooks";
 import { Header } from "./Header";
 import { Alert } from "./Alert";
 import { MetapageView } from "./MetapageView";
