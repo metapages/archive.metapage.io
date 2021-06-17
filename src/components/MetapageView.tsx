@@ -26,13 +26,26 @@ export const MetapageView: FunctionalComponent<{
   );
 
   useEffect(() => {
-    let layout: MetapageLayoutGrid | undefined = getLayout(
-      metapage.getDefinition()
-    );
-    if (!layout) {
-      layout = generateDefaultLayout(metapage);
-    }
-    setMetaframesArranged(applyLayout(layoutName, layout, metapage));
+    let cancelled = false;
+    (async () => {
+      let layout: MetapageLayoutGrid | undefined = getLayout(
+        metapage.getDefinition()
+      );
+      if (!layout) {
+        layout = generateDefaultLayout(metapage);
+      }
+
+      const elements = await applyLayout(layoutName, layout, metapage);
+      if (cancelled) {
+        return;
+      }
+
+      setMetaframesArranged(elements);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [metapage, setMetaframesArranged]);
 
   return <div class="siimple-grid">{metaframesArranged}</div>;
@@ -66,7 +79,8 @@ type Params = {
   defaultRowStyle: any;
   metaframes: { [key: string]: MetapageIFrameRpcClient };
 };
-const getFlexboxRowElementMetaframe = (params: Params) => {
+
+const getFlexboxRowElementMetaframe = async (params: Params) => {
   var { rowElement, metaframes, defaultRowStyle } = params;
   if (!metaframes) {
     return (
@@ -94,6 +108,8 @@ const getFlexboxRowElementMetaframe = (params: Params) => {
   const id = `siimple-card-${metaframeId}`;
   itemStyle["overflowY"] = "hidden";
 
+  const iframeElement = await metaframes[metaframeId].iframe;
+
   const metaframeContainer = (
     <div
       class="siimple-card-body siimple--mx-0 siimple--my-0 siimple--px-0 siimple--py-0"
@@ -101,7 +117,7 @@ const getFlexboxRowElementMetaframe = (params: Params) => {
     >
       <MetaframeView
         id={metaframeId}
-        iframe={metaframes[metaframeId].iframe}
+        iframe={iframeElement}
         style={itemStyle}
       />
     </div>
@@ -133,40 +149,47 @@ const getFlexboxRowElementUrl = (params: Params) => {
   );
 };
 
-const getFlexboxRowElement = (params: Params) => {
+const getFlexboxRowElement = async (params: Params) => {
   if (params.rowElement.url) {
     return getFlexboxRowElementUrl(params);
   } else {
-    return getFlexboxRowElementMetaframe(params);
+    const rowElement = await getFlexboxRowElementMetaframe(params);
+    return rowElement;
   }
 };
 
-const applyLayout = (
+const applyLayout = async (
   name: string,
   layout: MetapageLayoutGrid,
   metapage: Metapage
-) => {
-  // name = name ? name : LayoutFlexBoxGridName;
+): Promise<preact.JSX.Element[]> => {
   const metaframes = metapage.metaframes();
+
+  const elements: preact.JSX.Element[] = [];
 
   switch (name) {
     case LayoutFlexBoxGridName:
       // TODO process version when needed
-      return layout.layout.map((layoutRow) => {
+      for (const layoutRow of layout.layout) {
         let defaultRowStyle = layoutRow.reduce((curStyle, rowElement) => {
           return curStyle ? curStyle : rowElement.style;
         }, null);
 
-        const rowElements = layoutRow.map((rowElement) => {
-          return getFlexboxRowElement({
+        const rowElements: preact.JSX.Element[] = [];
+        for (const rowElement of layoutRow) {
+          const flexboxElement = await getFlexboxRowElement({
             rowElement,
             metaframes,
             defaultRowStyle,
           });
-        });
-        return <div class="row">{rowElements}</div>;
-      });
+          rowElements.push(flexboxElement);
+        }
+        elements.push(<div class="row">{rowElements}</div>);
+      }
+      break;
     default:
       throw `Unknown layout: ${name}`;
   }
+
+  return elements;
 };

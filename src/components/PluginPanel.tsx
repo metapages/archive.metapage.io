@@ -15,6 +15,10 @@ export const PluginPanel: FunctionalComponent<{
   const [_, setDefinition] =
     useState<MetapageDefinition | undefined>(undefined);
 
+  const [pluginElements, setPluginElements] = useState<preact.JSX.Element[]>(
+    []
+  );
+
   // TODO put this elsewhere as metapageDefinitionHook
   useEffect(() => {
     if (!metapage) {
@@ -31,45 +35,63 @@ export const PluginPanel: FunctionalComponent<{
     };
   }, [metapage, setDefinition]);
 
-  if (!metapage) {
-  }
+  useEffect(() => {
+    const pluginUrls: string[] = metapage ? metapage.getPluginIds() : [];
+    let cancelled = false;
 
-  const pluginUrls: string[] = metapage ? metapage.getPluginIds() : [];
-  const plugins = pluginUrls.map((url, index) => {
-    const pluginMetaframe = metapage!.getPlugin(url);
-    if (!pluginMetaframe) {
-      return null;
-    }
-    let styleHeight = "80vh";
+    (async () => {
+      const plugins: preact.JSX.Element[] = [];
+      for (const url of pluginUrls) {
+        if (cancelled) {
+          return;
+        }
+        const index = pluginUrls.indexOf(url);
+        const pluginMetaframe = metapage!.getPlugin(url);
+        if (!pluginMetaframe) {
+          continue;
+        }
+        let styleHeight = "80vh";
 
-    const style =
-      index == selected
-        ? { maxHeight: styleHeight, height: styleHeight, display: "" }
-        : { display: "none" };
+        const style =
+          index === selected
+            ? { maxHeight: styleHeight, height: styleHeight, display: "" }
+            : { display: "none" };
 
-    const metaframeContainer = (
-      <div class="siimple-card-body">
-        <MetaframeView
-          id={url}
-          iframe={pluginMetaframe.iframe}
-          style={{ maxHeight: styleHeight, height: styleHeight }}
-        />
-      </div>
-    );
+        const iframe = await pluginMetaframe.iframe;
+        if (cancelled) {
+          return;
+        }
 
-    return (
-      <div class="siimple-card" id={url} style={style}>
-        {metaframeContainer}
-      </div>
-    );
-  });
+        const metaframeContainer = (
+          <div class="siimple-card-body">
+            <MetaframeView
+              id={url}
+              iframe={iframe}
+              style={{ maxHeight: styleHeight, height: styleHeight }}
+            />
+          </div>
+        );
+
+        plugins.push(
+          <div class="siimple-card" id={url} style={style}>
+            {metaframeContainer}
+          </div>
+        );
+      }
+      setPluginElements(plugins);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [metapage, selected, setPluginElements]);
 
   const rule =
     selected > -1 ? <div class="siimple-rule siimple--mb-5"></div> : null;
 
   return (
     <div id="PluginPanel">
-      {plugins}
+      {pluginElements}
       {rule}
     </div>
   );

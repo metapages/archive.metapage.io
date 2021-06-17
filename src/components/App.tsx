@@ -11,14 +11,11 @@
  */
 
 import { h, FunctionalComponent } from "preact";
-import { useCallback, useState } from "preact/hooks";
-import {
-  MetapageDefinition,
-} from "@metapages/metapage";
+import { useCallback, useState } from 'preact/hooks';
 import { Header } from "./Header";
 import { Alert } from "./Alert";
 import { MetapageView } from "./MetapageView";
-import useHashParam from "use-hash-param";
+import { useHashParam } from "@metapages/metaframe-hook";
 import { AlertBlob } from "./Alert";
 import { metapageFromUrl } from "../hooks/metapageFromUrlHook";
 
@@ -118,7 +115,6 @@ export const App: FunctionalComponent = () => {
               base64 encoded metapage definition JSON:
             </label>
             <br />
-            {/* onKeyDown={this.onKeyDown} */}
             <textarea
               id="text:metapage.json"
               class="siimple-textarea siimple-textarea--fluid"
@@ -149,20 +145,6 @@ export const App: FunctionalComponent = () => {
       </div>
     </div>
   );
-};
-
-const getMetapageDefinitionFromUrl = async (
-  url: string
-): Promise<MetapageDefinition | undefined> => {
-  if (!url.endsWith(".json")) {
-    if (!url.endsWith("/")) {
-      url += "/";
-    }
-    url += "metapage.json";
-  }
-  const response = await fetch(url, {});
-  const metapageDefinition: MetapageDefinition = await response.json();
-  return metapageDefinition;
 };
 
 const exampleJson = JSON.stringify(
@@ -210,7 +192,7 @@ const exampleJson = JSON.stringify(
     },
     plugins: [
       "https://metapages.org/metaframes/mermaid.js/?TITLE=0",
-      "https://metapages.github.io/metaframe-editor/"
+      "https://metapages.github.io/metaframe-editor/",
     ],
   },
   null,

@@ -18,14 +18,15 @@ import {
   MetapageEventDefinition,
   MetapageDefinition,
 } from "@metapages/metapage";
-import { useHashParamJson } from "@metapages/metaframe-hook";
-import useHashParam from "use-hash-param";
+import { useHashParamJson, useHashParam } from "@metapages/metaframe-hook";
 
 export const metapageFromUrl: () => [
   Metapage | undefined,
   (definition: MetapageDefinition | undefined) => void,
   any
 ] = () => {
+
+  console.log(`hook metapageFromUrl`)
   const [url, setUrl] = useHashParam("url", undefined as any);
   const [error, setError] = useState<any>(undefined);
   const [metapageDefinition, setMetapageDefinition] =
@@ -39,6 +40,10 @@ export const metapageFromUrl: () => [
   const [metapage, setMetapage] = useState<Metapage | undefined>(undefined);
   // access the metapage without triggering a re-render
   const metapageRef = useRef<Metapage | undefined>(null);
+
+  console.log('metapageDefinitionBase64', metapageDefinitionBase64);
+
+  console.log('metapageDefinitionUrl', metapageDefinitionUrl);
 
   // - if there is a *just* a URL hash param: https://app.metapages.org/#url=<url>
   //   - then use the url definition
@@ -84,7 +89,7 @@ export const metapageFromUrl: () => [
         setMetapageDefinitionUrl(undefined);
       }
     })();
-  }, [alert, url, metapageDefinitionUrl, setMetapageDefinitionUrl, status]);
+  }, [alert, url, metapageDefinitionUrl, setMetapageDefinitionUrl, setUrl, status]);
 
   // if both exist #definition=<base64> #url=<url> then remove #url=<url>
   useEffect(() => {
@@ -118,6 +123,8 @@ export const metapageFromUrl: () => [
     setMetapageDefinition,
     metapage,
   ]);
+
+  console.log(`🐁 metapageDefinition ${metapageDefinition}`);
 
   // create or delete metapage from metapageDefinition
   useEffect(() => {
