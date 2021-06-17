@@ -18,11 +18,15 @@ import {
   MetapageEventDefinition,
   MetapageDefinition,
 } from "@metapages/metapage";
-import { useHashParamJson, useHashParam } from "@metapages/metaframe-hook";
+import {
+  useHashParamJson,
+  useHashParam,
+  SetHashParamOpts,
+} from "@metapages/metaframe-hook";
 
 export const metapageFromUrl: () => [
   Metapage | undefined,
-  (definition: MetapageDefinition | undefined) => void,
+  (definition: MetapageDefinition | undefined, opts?: SetHashParamOpts) => void,
   any
 ] = () => {
   const [url, setUrl] = useHashParam("url", undefined as any);
@@ -83,7 +87,14 @@ export const metapageFromUrl: () => [
         setMetapageDefinitionUrl(undefined);
       }
     })();
-  }, [alert, url, metapageDefinitionUrl, setMetapageDefinitionUrl, setUrl, status]);
+  }, [
+    alert,
+    url,
+    metapageDefinitionUrl,
+    setMetapageDefinitionUrl,
+    setUrl,
+    status,
+  ]);
 
   // if both exist #definition=<base64> #url=<url> then remove #url=<url>
   useEffect(() => {

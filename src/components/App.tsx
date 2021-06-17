@@ -34,7 +34,7 @@ export const App: FunctionalComponent = () => {
     try {
       // try to parse the JSON string
       const newMetapageBlob = JSON.parse(metapageJsonString);
-      setMetapageDefinition(newMetapageBlob);
+      setMetapageDefinition(newMetapageBlob, { modifyHistory: true });
     } catch (err) {
       // do something fancier there
       console.error(err);
