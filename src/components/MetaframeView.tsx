@@ -43,12 +43,11 @@ export const MetaframeView: FunctionalComponent<{
 
   // Optionally show a warning instead of the metaframe if missing required configuration
   const warning = iframe ? null : <div>Missing iframe for {id}</div>;
-  const containerId = `iframe-container-${id}`;
   return (
     <div
       ref={iframeContainer}
       class="iframe-container"
-      id={containerId}
+      id={`iframe-container-${id}`}
       style={style}
     >
       {" "}
