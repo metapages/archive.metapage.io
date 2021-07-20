@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@metapages/metaframe-hook": "^0.5.1",
-    "@metapages/metapage": "^0.8.3",
+    "@metapages/metapage": "^0.8.4",
     "flexboxgrid": "^6.3.1",
     "object-hash": "^2.1.1",
     "parcel-plugin-static-files-copy": "^2.6.0",
