@@ -15,7 +15,7 @@ import { useCallback, useState } from "preact/hooks";
 import { Header } from "./Header";
 import { Alert } from "./Alert";
 import { MetapageView } from "./MetapageView";
-import { useHashParam } from "@metapages/metaframe-hook";
+import { useHashParam, useHashParamBoolean } from "@metapages/metaframe-hook";
 import { AlertBlob } from "./Alert";
 import { metapageFromUrl } from "../hooks/metapageFromUrlHook";
 
@@ -26,6 +26,8 @@ export const App: FunctionalComponent = () => {
   const [alert, setAlert] = useState<AlertBlob | undefined>(undefined);
   const [url] = useHashParam("url", undefined as any);
   const [metapage, setMetapageDefinition] = metapageFromUrl();
+  const [minimal] = useHashParamBoolean("minimal", false);
+  console.log("minimal", minimal);
 
   const loadMetapageJsonFromTextBox = useCallback(() => {
     const metapageJsonString = (document!.getElementById(
@@ -42,9 +44,6 @@ export const App: FunctionalComponent = () => {
     }
   }, [setMetapageDefinition, setAlert]);
 
-  const headerDisabled =
-    new URL(window.location.href).searchParams.get("header") === "0";
-
   const getAlert = useCallback(() => {
     return alert ? (
       <div>
@@ -57,9 +56,7 @@ export const App: FunctionalComponent = () => {
   // if there's a metapage, we don't care about anything else
   if (metapage) {
     const header =
-      headerDisabled || !metapage ? null : (
-        <Header metapage={metapage} url={url} />
-      );
+      minimal || !metapage ? null : <Header metapage={metapage} url={url} />;
     return (
       <div id="app">
         {header}
@@ -128,6 +125,15 @@ export const App: FunctionalComponent = () => {
             >
               Load
             </div>
+          </div>
+        </div>
+
+        <div class="siimple-card">
+          <div class="siimple-card-body">
+            <label class="siimple-label">
+              (<code class="siimple-code">#minimal=true</code>) Remove headers
+              and plugin menu when displaying a metapage
+            </label>
           </div>
         </div>
 

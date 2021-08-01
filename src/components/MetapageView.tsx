@@ -1,6 +1,7 @@
 import { h, FunctionalComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { Metapage, MetapageIFrameRpcClient } from "@metapages/metapage";
+import { useHashParamBoolean } from "@metapages/metaframe-hook";
 import { MetaframeView } from "./MetaframeView";
 import {
   LayoutName as LayoutFlexBoxGridName,
@@ -8,6 +9,7 @@ import {
   getLayout,
   MetapageLayoutGrid,
   generateDefaultLayout,
+  RuntimeOptions,
 } from "./LayoutGrid";
 
 // For now, we only support one type of layout, bake it in here
@@ -21,6 +23,7 @@ export const MetapageView: FunctionalComponent<{
     return null;
   }
 
+  const [minimal] = useHashParamBoolean("minimal", false);
   const [metaframesArranged, setMetaframesArranged] = useState<h.JSX.Element[]>(
     []
   );
@@ -35,7 +38,9 @@ export const MetapageView: FunctionalComponent<{
         layout = generateDefaultLayout(metapage);
       }
 
-      const elements = await applyLayout(layoutName, layout, metapage);
+      const elements = await applyLayout(layoutName, layout, metapage, {
+        minimal: minimal!!,
+      });
       if (cancelled) {
         return;
       }
@@ -80,7 +85,10 @@ type Params = {
   metaframes: { [key: string]: MetapageIFrameRpcClient };
 };
 
-const getFlexboxRowElementMetaframe = async (params: Params) => {
+const getFlexboxRowElementMetaframe = async (
+  params: Params,
+  opts: RuntimeOptions
+) => {
   var { rowElement, metaframes, defaultRowStyle } = params;
   if (!metaframes) {
     return (
@@ -104,7 +112,9 @@ const getFlexboxRowElementMetaframe = async (params: Params) => {
   const colClass = rowElement.width ? rowElement.width : "col-xs";
   const itemStyle = rowElement.style ? rowElement.style : defaultRowStyle;
   const classes = `siimple-card ${colClass}`;
-  const header = <div class="siimple-card-header">{metaframeId}</div>;
+  const header = opts.minimal ? null : (
+    <div class="siimple-card-header">{metaframeId}</div>
+  );
   const id = `siimple-card-${metaframeId}`;
   itemStyle["overflowY"] = "hidden";
 
@@ -122,6 +132,7 @@ const getFlexboxRowElementMetaframe = async (params: Params) => {
       />
     </div>
   );
+
   return header ? (
     <div class={classes} id={id}>
       {header}
@@ -135,7 +146,7 @@ const getFlexboxRowElementMetaframe = async (params: Params) => {
 };
 
 // This iframe is sandboxed
-const getFlexboxRowElementUrl = (params: Params) => {
+const getFlexboxRowElementUrl = (params: Params, opts: RuntimeOptions) => {
   var { rowElement, defaultRowStyle } = params;
   var { url, width, style } = rowElement;
   const colClass = width ? width : "col-xs";
@@ -149,11 +160,11 @@ const getFlexboxRowElementUrl = (params: Params) => {
   );
 };
 
-const getFlexboxRowElement = async (params: Params) => {
+const getFlexboxRowElement = async (params: Params, opts: RuntimeOptions) => {
   if (params.rowElement.url) {
-    return getFlexboxRowElementUrl(params);
+    return getFlexboxRowElementUrl(params, opts);
   } else {
-    const rowElement = await getFlexboxRowElementMetaframe(params);
+    const rowElement = await getFlexboxRowElementMetaframe(params, opts);
     return rowElement;
   }
 };
@@ -161,7 +172,8 @@ const getFlexboxRowElement = async (params: Params) => {
 const applyLayout = async (
   name: string,
   layout: MetapageLayoutGrid,
-  metapage: Metapage
+  metapage: Metapage,
+  opts: RuntimeOptions
 ): Promise<preact.JSX.Element[]> => {
   const metaframes = metapage.metaframes();
 
@@ -177,11 +189,14 @@ const applyLayout = async (
 
         const rowElements: preact.JSX.Element[] = [];
         for (const rowElement of layoutRow) {
-          const flexboxElement = await getFlexboxRowElement({
-            rowElement,
-            metaframes,
-            defaultRowStyle,
-          });
+          const flexboxElement = await getFlexboxRowElement(
+            {
+              rowElement,
+              metaframes,
+              defaultRowStyle,
+            },
+            opts
+          );
           rowElements.push(flexboxElement);
         }
         elements.push(<div class="row">{rowElements}</div>);
