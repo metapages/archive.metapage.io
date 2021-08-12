@@ -27,7 +27,6 @@ export const App: FunctionalComponent = () => {
   const [url] = useHashParam("url", undefined as any);
   const [metapage, setMetapageDefinition] = metapageFromUrl();
   const [minimal] = useHashParamBoolean("minimal", false);
-  console.log("minimal", minimal);
 
   const loadMetapageJsonFromTextBox = useCallback(() => {
     const metapageJsonString = (document!.getElementById(
