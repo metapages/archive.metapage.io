@@ -7,7 +7,7 @@ export const MetaframeView: FunctionalComponent<{
   style?: any;
 }> = ({ id, iframe, style }) => {
   // Initialize useRef with an initial value of `null`
-  const iframeContainer = useRef(null);
+  const iframeContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (iframeContainer.current) {
