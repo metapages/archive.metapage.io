@@ -197,7 +197,7 @@ const exampleJson = JSON.stringify(
     },
     plugins: [
       "https://metapages.org/metaframes/mermaid.js/?TITLE=0",
-      "https://metapages.github.io/metaframe-editor/",
+      "https://metapages.github.io/metaframe-editor/#?options=eyJtb2RlIjoianNvbiIsInNhdmVsb2FkaW5oYXNoIjpmYWxzZSwidGhlbWUiOiJ2cy1kYXJrIn0=",
     ],
   },
   null,
