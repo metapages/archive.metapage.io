@@ -5,7 +5,7 @@ set shell := ["bash", "-c"]
 # E.g. 'my.app.com'. Some services e.g. auth need know the external endpoint for example OAuth
 # The root domain for this app, serving index.html
 export APP_FQDN                    := env_var_or_default("APP_FQDN", "metaframe1.dev")
-export APP_PORT                    := env_var_or_default("APP_PORT", "443")
+export APP_PORT                    := env_var_or_default("APP_PORT", "4430")
 # browser hot-module-replacement (live reloading)
 export PORT_HMR                    := env_var_or_default("PORT_HMR", "3458")
 # see https://github.com/parcel-bundler/parcel/issues/2031

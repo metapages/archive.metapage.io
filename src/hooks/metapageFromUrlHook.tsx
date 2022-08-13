@@ -22,7 +22,7 @@ import {
   useHashParamJson,
   useHashParam,
   SetHashParamOpts,
-} from "@metapages/metaframe-hook";
+} from "@metapages/hash-query";
 
 export const metapageFromUrl: () => [
   Metapage | undefined,

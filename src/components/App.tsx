@@ -15,7 +15,7 @@ import { useCallback, useState } from "preact/hooks";
 import { Header } from "./Header";
 import { Alert } from "./Alert";
 import { MetapageView } from "./MetapageView";
-import { useHashParam, useHashParamBoolean } from "@metapages/metaframe-hook";
+import { useHashParam, useHashParamBoolean } from "@metapages/hash-query";
 import { AlertBlob } from "./Alert";
 import { metapageFromUrl } from "../hooks/metapageFromUrlHook";
 

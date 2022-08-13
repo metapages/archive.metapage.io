@@ -1,7 +1,7 @@
 import { h, FunctionalComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { Metapage, MetapageIFrameRpcClient } from "@metapages/metapage";
-import { useHashParamBoolean } from "@metapages/metaframe-hook";
+import { useHashParamBoolean } from "@metapages/hash-query";
 import { MetaframeView } from "./MetaframeView";
 import {
   LayoutName as LayoutFlexBoxGridName,
