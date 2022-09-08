@@ -1,4 +1,4 @@
-import { Metapage, MetapageDefinition } from "@metapages/metapage";
+import { Metapage, MetapageDefinitionV3 } from "@metapages/metapage";
 
 export const LayoutName = "flexboxgrid";
 
@@ -33,7 +33,7 @@ export type LayoutFlexBoxGridElement = {
 };
 
 export const getLayout = (
-  metapageDefinition: MetapageDefinition
+  metapageDefinition: MetapageDefinitionV3
 ): MetapageLayoutGrid | undefined => {
   if (metapageDefinition?.meta?.layouts?.[LayoutName]) {
     return metapageDefinition.meta.layouts[LayoutName] as MetapageLayoutGrid;

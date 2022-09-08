@@ -16,7 +16,8 @@ import {
   Metapage,
   MetapageEvents,
   MetapageEventDefinition,
-  MetapageDefinition,
+  MetapageDefinitionV3,
+  convertMetapageDefinitionToCurrentVersion,
 } from "@metapages/metapage";
 import {
   useHashParamJson,
@@ -26,19 +27,21 @@ import {
 
 export const metapageFromUrl: () => [
   Metapage | undefined,
-  (definition: MetapageDefinition | undefined, opts?: SetHashParamOpts) => void,
+  (
+    definition: MetapageDefinitionV3 | undefined,
+    opts?: SetHashParamOpts
+  ) => void,
   any
 ] = () => {
   const [url, setUrl] = useHashParam("url", undefined as any);
   const [error, setError] = useState<any>(undefined);
   const [metapageDefinition, setMetapageDefinition] =
-    useState<MetapageDefinition | null>(null);
-  const [metapageDefinitionUrl, setMetapageDefinitionUrl] =
-    useState<{ definition: MetapageDefinition; url: string } | undefined>(
-      undefined
-    );
+    useState<MetapageDefinitionV3 | null>(null);
+  const [metapageDefinitionUrl, setMetapageDefinitionUrl] = useState<
+    { definition: MetapageDefinitionV3; url: string } | undefined
+  >(undefined);
   const [metapageDefinitionBase64, setMetapageDefinitionBase64] =
-    useHashParamJson<MetapageDefinition>("definition");
+    useHashParamJson<MetapageDefinitionV3>("definition");
   const [metapage, setMetapage] = useState<Metapage | undefined>(undefined);
   // access the metapage without triggering a re-render
   const metapageRef = useRef<Metapage | undefined>(null);
@@ -72,7 +75,7 @@ export const metapageFromUrl: () => [
     const thisUrl = url;
     (async () => {
       try {
-        const definition: MetapageDefinition | undefined =
+        const definition: MetapageDefinitionV3 | undefined =
           await getMetapageDefinitionFromUrl(thisUrl);
         if (!definition) {
           throw `No MetapageDefinition found at: ${thisUrl}`;
@@ -106,7 +109,7 @@ export const metapageFromUrl: () => [
   // choose the metapage definition or delete it
   useEffect(() => {
     // base64 always has priority (and if both, the url param will be removed)
-    const newMetapageDefinition: MetapageDefinition | undefined =
+    const newMetapageDefinition: MetapageDefinitionV3 | undefined =
       metapageDefinitionBase64 || metapageDefinitionUrl?.definition;
     if (!newMetapageDefinition) {
       if (metapageDefinition) {
@@ -178,7 +181,7 @@ export const metapageFromUrl: () => [
     // update our definition if a plugin sets it
     removeListeners.push(
       (() => {
-        const listener = (definition: MetapageDefinition) => {
+        const listener = (definition: MetapageDefinitionV3) => {
           // if a plugin modifies the definition, update the hash param that is the source of truth
           setMetapageDefinitionBase64(definition);
         };
@@ -202,7 +205,7 @@ export const metapageFromUrl: () => [
 
 const getMetapageDefinitionFromUrl = async (
   url: string
-): Promise<MetapageDefinition | undefined> => {
+): Promise<MetapageDefinitionV3 | undefined> => {
   if (!url.endsWith(".json")) {
     if (!url.endsWith("/")) {
       url += "/";
@@ -210,6 +213,8 @@ const getMetapageDefinitionFromUrl = async (
     url += "metapage.json";
   }
   const response = await fetch(url, {});
-  const metapageDefinition: MetapageDefinition = await response.json();
+  let metapageDefinition: MetapageDefinitionV3 = await response.json();
+  metapageDefinition =
+    convertMetapageDefinitionToCurrentVersion(metapageDefinition);
   return metapageDefinition;
 };

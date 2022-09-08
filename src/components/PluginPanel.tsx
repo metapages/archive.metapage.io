@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { MetaframeView } from "./MetaframeView";
 import {
   Metapage,
-  MetapageDefinition,
+  MetapageDefinitionV3,
   MetapageEvents,
   MetapageEventDefinition,
 } from "@metapages/metapage";
@@ -13,7 +13,7 @@ export const PluginPanel: FunctionalComponent<{
   metapage: Metapage | undefined;
 }> = ({ selected, metapage }) => {
   const [_, setDefinition] =
-    useState<MetapageDefinition | undefined>(undefined);
+    useState<MetapageDefinitionV3 | undefined>(undefined);
 
   const [pluginElements, setPluginElements] = useState<preact.JSX.Element[]>(
     []

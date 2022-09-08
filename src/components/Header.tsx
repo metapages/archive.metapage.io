@@ -3,12 +3,12 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 import {
   Metapage,
   MetapageEvents,
-  MetapageDefinition,
-  MetaframeDefinition,
+  MetapageDefinitionV3,
+  MetaframeDefinitionV6,
 } from "@metapages/metapage";
 import { PluginPanel } from "./PluginPanel";
 
-type PluginDefinitions = { [key in string]: MetaframeDefinition | undefined };
+type PluginDefinitions = { [key in string]: MetaframeDefinitionV6 | undefined };
 
 export const Header: FunctionalComponent<{
   metapage: Metapage;
@@ -33,7 +33,7 @@ export const Header: FunctionalComponent<{
             return metapage
               .getPlugin(pluginIdIsUrl)
               .getDefinition()
-              .then((metaframeDefinition: MetaframeDefinition|undefined) => {
+              .then((metaframeDefinition: MetaframeDefinitionV6|undefined) => {
                 if (metaframeDefinition) {
                   newPluginDefinitions[pluginIdIsUrl] = metaframeDefinition;
                 }
@@ -87,14 +87,12 @@ export const Header: FunctionalComponent<{
             {metapage
               .getPluginIds()
               .map((pluginId) => {
-                const pluginMetaframeDefinition :MetaframeDefinition | undefined = pluginDefinitions[pluginId];
+                const pluginMetaframeDefinition :MetaframeDefinitionV6 | undefined = pluginDefinitions[pluginId];
                 // TODO process version when needed
                 const pluginMetadata = pluginMetaframeDefinition?.metadata;
 
                 if (pluginMetadata && (pluginMetadata as any).name) {
                   return (pluginMetadata as any).name;
-                } else if (pluginMetadata && pluginMetadata.title) {
-                  return pluginMetadata.title;
                 } else {
                   // what should I use as the short link name?
                   // the last part of the url
@@ -136,7 +134,7 @@ export const Header: FunctionalComponent<{
 };
 
 const getMetapageName = (args: {
-  definition: MetapageDefinition | undefined;
+  definition: MetapageDefinitionV3 | undefined;
   url: string | undefined;
 }) => {
   const { definition, url } = args;
