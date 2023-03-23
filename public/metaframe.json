@@ -1,0 +1,18 @@
+{
+	"version": "0.6",
+	"metadata": {
+		"name": "metaframe template",
+		"tags": []
+	},
+	"inputs": {
+		"*": {
+			"type": "application/octet-stream:base64"
+		}
+	},
+	"outputs": {
+		"*": {
+			"type": "application/octet-stream:base64"
+		}
+	},
+	"allow": "cross-origin-isolated"
+}
