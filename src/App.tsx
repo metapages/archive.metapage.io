@@ -27,14 +27,15 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import { AlertBlob, Message } from "./components/Message";
 import { MenuMetapage } from "./components/MenuMetapage";
-import { OptionKeyDisableLayoutEdit, OptionKeyHideHeader } from "./components/OptionsPanel";
+import {
+  OptionKeyDisableLayoutEdit,
+  OptionKeyHideHeader,
+} from "./components/OptionsPanel";
 import { PanelHelp } from "./components/PanelHelp";
 import { getPluginTabs, TabData, TabItem } from "./hooks/getPluginTabs";
 import { metapageDefinitionFromUrl } from "./hooks/metapageDefinitionFromUrl";
 import { MetapageGridLayoutFromDefinition } from "./lib";
 import { CustomGridItemComponentLabel } from "./CustomGridItemComponentLabel";
-
-
 
 export const App: React.FC = () => {
   const [alert, setAlert] = useState<AlertBlob | undefined>(undefined);
@@ -70,16 +71,16 @@ export const App: React.FC = () => {
             {mainAlert}
             {/* <AuthorAndDescription /> */}
             <Box w="100%">
-            <MetapageGridLayoutFromDefinition
-              definition={metapageDefinition}
-              // metapage={metapage}
-              disableEditing={disableLayoutEdits}
-              onMetapage={onMetapage}
-              onDefinition={onDefinition}
-              // onOutputs={onOutputs as any}
-              Wrapper={CustomGridItemComponentLabel}
-              // ErrorWrapper={CustomErrorDisplay}
-            />
+              <MetapageGridLayoutFromDefinition
+                definition={metapageDefinition}
+                // metapage={metapage}
+                disableEditing={disableLayoutEdits}
+                onMetapage={onMetapage}
+                onDefinition={onDefinition}
+                // onOutputs={onOutputs as any}
+                Wrapper={CustomGridItemComponentLabel}
+                // ErrorWrapper={CustomErrorDisplay}
+              />
             </Box>
           </VStack>
         ) : (
@@ -89,25 +90,6 @@ export const App: React.FC = () => {
       ...pluginTabData,
     ]);
   }, [pluginTabData, metapageDefinition, onDefinition]);
-
-  const loadMetapageJsonFromTextBox = useCallback(() => {
-    const metapageJsonString = (document!.getElementById(
-      "text:metapage.json"
-    ) as HTMLInputElement)!.value!;
-    try {
-      // try to parse the JSON string
-      const newMetapageBlob = JSON.parse(metapageJsonString);
-      setMetapageDefinition(newMetapageBlob, { modifyHistory: true });
-    } catch (err) {
-      // do something fancier there
-      console.error(err);
-      setAlert({
-        level: "error",
-        title: "Failed to parse JSON",
-        description: `${err}`,
-      });
-    }
-  }, [setMetapageDefinition, setAlert]);
 
   const getAlert = useCallback(() => {
     return alert ? (
@@ -123,15 +105,14 @@ export const App: React.FC = () => {
 
   if (hideHeader) {
     return (
-      <VStack w="100%" h="100vh" alignItems="flex-start" >
+      <VStack w="100%" h="100vh" alignItems="flex-start">
         <HStack p={1} w="100%" justifyContent="space-between">
           <MetapageHeader />
           <Spacer />
           <MenuMetapage />
         </HStack>
         <Box p={1} w="100%" alignContent="stretch">
-        {finalTabData[0]?.content}
-
+          {finalTabData[0]?.content}
         </Box>
       </VStack>
     );
@@ -157,8 +138,6 @@ export const App: React.FC = () => {
           {pluginTabData.map((tab: TabItem, index: number) => (
             <Tab key={index + 1}>{tab.label}</Tab>
           ))}
-
-
         </TabList>
         <TabPanels>
           {finalTabData.map((tab: TabItem, index: number) => (
@@ -171,26 +150,6 @@ export const App: React.FC = () => {
     </div>
   );
 };
-
-
-
-// const examples = [
-//   `${METAPAGES_ORG}metapages/linked-molecule-viewers/metapage.json`,
-//   `${METAPAGES_ORG}metapages/dynamic-plot/metapage.json`,
-// ]
-//   .map(
-//     (url) =>
-//       `${
-//         typeof window !== "undefined" ? window.location.origin : ""
-//       }/#?url=${url}`
-//   )
-//   .map((url) => (
-//     <div class="siimple-list-item">
-//       <a href={url} class="siimple-link">
-//         {url}
-//       </a>
-//     </div>
-//   ));
 
 const MetapageHeader: React.FC = () => {
   const [metapage] = metapageDefinitionFromUrl();

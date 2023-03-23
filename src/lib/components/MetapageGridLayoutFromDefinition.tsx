@@ -7,6 +7,7 @@ import {
   MetapageEventDefinition,
   MetapageEvents,
   MetapageInstanceInputs,
+  pageLoaded,
 } from '@metapages/metapage';
 import hash from 'object-hash';
 import React, { ComponentType, useCallback, useEffect, useRef, useState } from 'react';
@@ -87,23 +88,35 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
     if (!definitionInternal) {
       return;
     }
+    let cancelled = false;
+    let metapageNew:Metapage|undefined;
+    (async () => {
+      if (cancelled) {
+        return;
+      }
 
-    // now actually create the metapage
-    const metapageNew = new Metapage();
-    metapageNew.debug = debug!!;
-    try {
-      metapageNew.setDefinition(definitionInternal);
-    } catch (err) {
-      setMetapageInternal(undefined);
-      setError(err);
-      return;
-    }
+      // now actually create the metapage
+      await pageLoaded();
+      if (cancelled) {
+        return;
+      }
+      metapageNew = new Metapage();
+      metapageNew.debug = debug!!;
+      try {
+        metapageNew.setDefinition(definitionInternal);
+      } catch (err) {
+        setMetapageInternal(undefined);
+        setError(err);
+        return;
+      }
 
-    setMetapageInternal(metapageNew);
-    onMetapage?.(metapageNew);
+      setMetapageInternal(metapageNew);
+      onMetapage?.(metapageNew);
+    })();
 
     return () => {
-      metapageNew.dispose();
+      cancelled = true;
+      metapageNew?.dispose();
     };
   }, [
     onMetapage,

@@ -1,16 +1,10 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  Heading,
-  useToast,
-} from "@chakra-ui/react";
-import React, { useCallback, useEffect, useState } from "react";
-import { MetaframeInputMap, MetapageDefinitionV3 } from "@metapages/metapage";
-import { usePasteMetapageDefinition } from "../hooks/usePasteMetapageDefinition";
-import { MetaframeStandaloneComponent } from "../lib/components/MetaframeStandaloneComponent";
-import { metapageDefinitionFromUrl } from "../hooks/metapageDefinitionFromUrl";
+import { Box, Button, Card, CardBody, Spinner, useToast } from '@chakra-ui/react';
+import { MetaframeInputMap } from '@metapages/metapage';
+import React, { useCallback, useState } from 'react';
+
+import { metapageDefinitionFromUrl } from '../hooks/metapageDefinitionFromUrl';
+import { usePasteMetapageDefinition } from '../hooks/usePasteMetapageDefinition';
+import { MetaframeStandaloneComponent } from '../lib/components/MetaframeStandaloneComponent';
 
 // change this if developing locally the root site to the demo metapages
 const METAPAGES_ORG = "https://metapages.org/";
@@ -18,7 +12,9 @@ const METAPAGES_ORG = "https://metapages.org/";
 export const PanelPasteJson: React.FC = () => {
   // this panel allows pasting in new metapage JSON
   usePasteMetapageDefinition();
-  const [_, setMetapageDefinition] = metapageDefinitionFromUrl();
+  const [metapageDefinition, setMetapageDefinition] =
+    metapageDefinitionFromUrl();
+
   const toast = useToast();
 
   const [metapageJsonInEditor, setMetapageJsonInEditor] =
@@ -30,7 +26,6 @@ export const PanelPasteJson: React.FC = () => {
         return;
       }
       setMetapageJsonInEditor(outputs["value"]);
-      // onChange(outputs["value"]);
     },
     [setMetapageJsonInEditor]
   );
@@ -59,21 +54,17 @@ export const PanelPasteJson: React.FC = () => {
           metapage
         </Box>
 
-        {/* <Heading size="sm">
-
-
-
-          Paste metapage JSON from the clipboard and this page will show
-          the metapage
-        </Heading> */}
-
         <Box w="100%" h="500px">
-          <MetaframeStandaloneComponent
-            url="https://editor.mtfm.io/#?options=eyJhdXRvc2VuZCI6dHJ1ZSwiaGlkZW1lbnVpZmlmcmFtZSI6dHJ1ZSwibW9kZSI6Impzb24iLCJ0aGVtZSI6ImxpZ2h0In0="
-            inputs={{ value: metapageJsonInEditor }}
-            onOutputs={onOutputs}
-            height="500px"
-          />
+          {metapageDefinition ? (
+            <Spinner />
+          ) : (
+            <MetaframeStandaloneComponent
+              url="https://editor.mtfm.io/#?options=eyJhdXRvc2VuZCI6dHJ1ZSwiaGlkZW1lbnVpZmlmcmFtZSI6dHJ1ZSwibW9kZSI6Impzb24iLCJ0aGVtZSI6ImxpZ2h0In0="
+              inputs={{ value: metapageJsonInEditor }}
+              onOutputs={onOutputs}
+              height="500px"
+            />
+          )}
         </Box>
 
         <Button colorScheme="blue" onClick={onClick}>
@@ -90,40 +81,34 @@ const exampleJson = JSON.stringify(
     meta: {
       layouts: {
         "react-grid-layout": {
-          "docs": "https://www.npmjs.com/package/react-grid-layout",
-          "layout": [
+          docs: "https://www.npmjs.com/package/react-grid-layout",
+          layout: [
             {
-              "h": 3,
-              "i": "graph-dynamic",
-              "moved": false,
-              "static": false,
-              "w": 6,
-              "x": 0,
-              "y": 0
+              h: 3,
+              i: "graph-dynamic",
+              moved: false,
+              static: false,
+              w: 6,
+              x: 0,
+              y: 0,
             },
             {
-              "h": 3,
-              "i": "random-data-generator",
-              "moved": false,
-              "static": false,
-              "w": 6,
-              "x": 6,
-              "y": 0
-            }
+              h: 3,
+              i: "random-data-generator",
+              moved: false,
+              static: false,
+              w: 6,
+              x: 6,
+              y: 0,
+            },
           ],
-          "props": {
-            "cols": 12,
-            "containerPadding": [
-              5,
-              5
-            ],
-            "margin": [
-              10,
-              20
-            ],
-            "rowHeight": 100
-          }
-        }
+          props: {
+            cols: 12,
+            containerPadding: [5, 5],
+            margin: [10, 20],
+            rowHeight: 100,
+          },
+        },
       },
     },
     metaframes: {
