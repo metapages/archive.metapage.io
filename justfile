@@ -1,96 +1,201 @@
-# https://github.com/casey/just
-
-set shell := ["bash", "-c"]
-
+###############################################################
+# Minimal commands to develop, build, test, and deploy
+###############################################################
+# just docs: https://github.com/casey/just
+set shell                          := ["bash", "-c"]
+set dotenv-load                    := true
 # E.g. 'my.app.com'. Some services e.g. auth need know the external endpoint for example OAuth
 # The root domain for this app, serving index.html
-export APP_FQDN                    := env_var_or_default("APP_FQDN", "metaframe1.dev")
+export APP_FQDN                    := env_var_or_default("APP_FQDN", "metaframe1.localhost")
 export APP_PORT                    := env_var_or_default("APP_PORT", "4430")
-# browser hot-module-replacement (live reloading)
-export PORT_HMR                    := env_var_or_default("PORT_HMR", "3458")
-# see https://github.com/parcel-bundler/parcel/issues/2031
-PARCEL_WORKERS                     := env_var_or_default("PARCEL_WORKERS", `if [ -f /.dockerenv ]; then echo "1" ; fi`)
-parcel                             := "PARCEL_WORKERS=" + PARCEL_WORKERS +  " node_modules/parcel-bundler/bin/cli.js"
+ROOT                               := env_var_or_default("GITHUB_WORKSPACE", `(which git >/dev/null && git rev-parse --show-toplevel) || pwd`)
+export CI                          := env_var_or_default("CI", "")
+PACKAGE_NAME_SHORT                 := file_name(`cat package.json | jq -r '.name' | sd '.*/' ''`)
+# Store the CI/dev docker image in github
+# ghcr.io packages cannot have more than one "/" after the organization name
+export DOCKER_IMAGE_PREFIX         := "ghcr.io/metapages/" + PACKAGE_NAME_SHORT
+# Always assume our current cloud ops image is versioned to the exact same app images we deploy
+export DOCKER_TAG                  := `if [ "${GITHUB_ACTIONS}" = "true" ]; then echo "${GITHUB_SHA}"; else echo "$(git rev-parse --short=8 HEAD)"; fi`
+# The NPM_TOKEN is required for publishing to https://www.npmjs.com
+NPM_TOKEN                          := env_var_or_default("NPM_TOKEN", "")
+# Source of deno scripts. When developing we need to switch this
+DENO_SOURCE                        := env_var_or_default("DENO_SOURCE", "https://deno.land/x/metapages@v0.0.17")
+# vite needs an extra memory boost
+vite                               := "VITE_APP_FQDN=" + APP_FQDN + " VITE_APP_PORT=" + APP_PORT + " NODE_OPTIONS='--max_old_space_size=16384' ./node_modules/vite/bin/vite.js"
 tsc                                := "./node_modules/typescript/bin/tsc"
 # minimal formatting, bold is very useful
-bold     := '\033[1m'
-normal   := '\033[0m'
+bold                               := '\033[1m'
+normal                             := '\033[0m'
+green                              := "\\e[32m"
+yellow                             := "\\e[33m"
+blue                               := "\\e[34m"
+magenta                            := "\\e[35m"
+grey                               := "\\e[90m"
 
+# If not in docker, get inside
 @_help:
-	just --list --unsorted --list-heading $'🚪 Commands:\n\n'
+    echo -e ""
+    just --list --unsorted --list-heading $'🌱 Commands:\n\n'
+    echo -e ""
+    echo -e "    Github  URL 🔗 {{green}}$(cat package.json | jq -r '.repository.url'){{normal}}"
+    echo -e "    Publish URL 🔗 {{green}}https://$(cat package.json | jq -r '.name' | sd '/.*' '' | sd '@' '').github.io/{{PACKAGE_NAME_SHORT}}/{{normal}}"
+    echo -e "    Develop URL 🔗 {{green}}https://{{APP_FQDN}}:{{APP_PORT}}/{{normal}}"
+    echo -e ""
 
-# _ensure_npm_modules
-# Run the browser dev server
-dev: _mkcert (_tsc "--build --verbose")
+# Run the dev server. Opens the web app in browser.
+dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     #!/usr/bin/env bash
-    # Running inside docker requires modified startup configuration, HMR and HTTPS are disabled
-    if [ -f /.dockerenv ]; then
-        echo "💥 Missing feature: parcel (builds browser assets) cannot be run in development mode in a docker container"
-        {{parcel}} serve \
-                        --port ${APP_PORT} \
-                        --host 0.0.0.0 \
-                        --no-hmr \
-                        public/index.html
-    else
-        APP_ORIGIN=https://${APP_FQDN}:${APP_PORT}
-        echo "Browser development pointing to: ${APP_ORIGIN}"
-        {{parcel}} serve \
-                        --cert .certs/${APP_FQDN}.pem \
-                        --key  .certs/${APP_FQDN}-key.pem \
-                        --port ${APP_PORT} \
-                        --host ${APP_FQDN} \
-                        --hmr-port ${PORT_HMR} \
-                        public/index.html --open
+    set -euo pipefail
+    APP_ORIGIN=https://${APP_FQDN}:${APP_PORT}
+    echo "Browser development pointing to: ${APP_ORIGIN}"
+    if [ ]
+    deno run --allow-all --unstable {{DENO_SOURCE}}/exec/open_url.ts https://metapages.github.io/load-page-when-available/?url=https://${APP_FQDN}:${APP_PORT}
+    npm i
+    export HOST={{APP_FQDN}}
+    export PORT={{APP_PORT}}
+    export CERT_FILE=.certs/{{APP_FQDN}}.pem
+    export CERT_KEY_FILE=.certs/{{APP_FQDN}}-key.pem
+    export BASE=
+    VITE_APP_ORIGIN=${APP_ORIGIN} {{vite}} --clearScreen false
+
+# Increment semver version, push the tags (triggers "on-tag-version")
+@publish npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
+    # Push the tags up
+    git push origin v$(cat package.json | jq -r '.version')
+
+# Publish targets (add to the end of the on-tag-version command to execute):
+#   - `_npm_publish`: publish to npm
+#   - `_githubpages_publish`: publish to github pages
+#   - `_cloudflare_pages_publish`: publish to cloudflare pages
+# Reaction to "publish". On new git version tag: publish code [github pages, cloudflare pages, npm]
+on-tag-version: _fix_git_actions_permission _ensure_npm_modules _ensureGitPorcelain _cloudflare_pages_publish
+
+# build the browser app in ./docs (default for github pages)
+_browser_client_build BASE="": _ensure_deno
+    HOST={{APP_FQDN}} \
+    OUTDIR=./docs \
+    BASE={{BASE}} \
+        deno run --allow-all --unstable {{DENO_SOURCE}}/browser/vite-build.ts --versioning=true
+
+# Test: currently bare minimum: only building. Need proper test harness.
+@test: (_tsc "--build") build
+
+# Build the [browser app, npm lib] for production. Called automatically by "test" and "publish"
+build BASE="": _ensure_npm_modules (_tsc "--build") (_browser_client_build BASE) _npm_build
+
+# Deletes: [ .certs, dist ]
+@clean:
+    rm -rf .certs dist
+
+# Rebuild the browser assets on changes, but do not serve
+watch:
+    watchexec -w src -w tsconfig.json -w package.json -w vite.config.ts -- just build
+
+# Watch and serve browser client. Can't use vite to serve: https://github.com/vitejs/vite/issues/2754
+serve: _mkcert build
+    cd docs && \
+    npx http-server --cors '*' -a {{APP_FQDN}} -p {{APP_PORT}} --ssl --cert ../.certs/{{APP_FQDN}}.pem --key ../.certs/{{APP_FQDN}}-key.pem
+
+# Build npm package for publishing
+@_npm_build: _ensure_npm_modules _ensure_deno
+    mkdir -p dist
+    rm -rf dist/*
+    {{tsc}} --noEmit false --project ./tsconfig.npm.json
+    OUTDIR=./dist \
+    DEPLOY_TARGET=lib \
+        deno run --allow-all --unstable {{DENO_SOURCE}}/browser/vite-build.ts
+    echo "  ✅ npm build"
+
+# bumps version, commits change, git tags
+@_npm_version npmversionargs="patch":
+    npm version {{npmversionargs}}
+    echo -e "  📦 new version: {{green}}$(cat package.json | jq -r .version){{normal}}"
+
+# If the npm version does not exist, publish the module
+_npm_publish: _require_NPM_TOKEN _npm_build
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ "$CI" != "true" ]; then
+        # This check is here to prevent publishing if there are uncommitted changes, but this check does not work in CI environments
+        # because it starts as a clean checkout and git is not installed and it is not a full checkout, just the tip
+        if [[ $(git status --short) != '' ]]; then
+            git status
+            echo -e '💥 Cannot publish with uncommitted changes'
+            exit 2
+        fi
     fi
 
-# deploy to gh-pages branch
-publish: build
-	npm run deploy
+    PACKAGE_EXISTS=true
+    if npm search $(cat package.json | jq -r .name) | grep -q  "No matches found"; then
+        echo -e "  👉 new npm module !"
+        PACKAGE_EXISTS=false
+    fi
+    VERSION=$(cat package.json | jq -r '.version')
+    if [ $PACKAGE_EXISTS = "true" ]; then
+        INDEX=$(npm view $(cat package.json | jq -r .name) versions --json | jq "index( \"$VERSION\" )")
+        if [ "$INDEX" != "null" ]; then
+            echo -e '  🌳 Version exists, not publishing'
+            exit 0
+        fi
+    fi
 
-# _ensure_npm_modules
-# Build the npm module
-build: (_tsc "--build --verbose")
-	rm -rf dist/*
-	{{parcel}} build 'public/index.html' --public-url ./ --no-autoinstall --detailed-report 50
-	cp src/CNAME dist/
-
-# rebuild the client on changes, but do not serve
-watch:
-    @# ts-node-dev does not work with typescript project references https://github.com/TypeStrong/ts-node/issues/897
-    watchexec --restart --watch ./src --watch ./justfile --watch ./package.json --watch ./tsconfig.json -- bash -c '{{tsc}} --build --verbose && {{parcel}} watch --public-url ./ public/index.html'
-
-# deletes .cache .parcel-cache .certs dist
-clean:
-    rm -rf .cache .parcel-cache .certs dist
+    echo -e "  👉 PUBLISHING npm version $VERSION"
+    if [ ! -f .npmrc ]; then
+        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+    fi
+    npm publish --access public .
 
 # compile typescript src, may or may not emit artifacts
-_tsc +args="":
+_tsc +args="": _ensure_npm_modules
     {{tsc}} {{args}}
 
-_mkcert:
-    #!/usr/bin/env bash
-    echo -e "🚪 Check local mkcert certificates and /etc/hosts with APP_FQDN=${APP_FQDN}"
-    if [ -n "$CI" ]; then
-        echo "CI=$CI ∴ skipping mkcert"
-        exit 0
-    fi
-    if [ -f /.dockerenv ]; then \
-        echo "Inside docker context, assuming mkcert has been run on the host"
-        exit 0;
-    fi
-    if ! command -v mkcert &> /dev/null; then echo "💥 {{bold}}mkcert{{normal}}💥 is not installed (manual.md#host-requirements): https://github.com/FiloSottile/mkcert"; exit 1; fi
-    if [ ! -f .certs/{{APP_FQDN}}-key.pem ]; then
-        mkdir -p .certs/ ;
-        cd .certs/ && mkcert -cert-file {{APP_FQDN}}.pem -key-file {{APP_FQDN}}-key.pem {{APP_FQDN}} localhost ;
-    fi
-    if ! cat /etc/hosts | grep "{{APP_FQDN}}" &> /dev/null; then
-        echo -e "";
-        echo -e "💥Add to /etc/hosts: 'sudo vi /etc/hosts'💥";
-        echo -e "";
-        echo -e "      {{bold}}127.0.0.1     {{APP_FQDN}}{{normal}}";
-        echo -e "";
-        exit 1;
-    fi
+# DEV: generate TLS certs for HTTPS over localhost https://blog.filippo.io/mkcert-valid-https-certificates-for-localhost/
+@_mkcert: _ensure_deno
+    APP_FQDN={{APP_FQDN}} CERTS_DIR=.certs deno run --allow-all --unstable {{DENO_SOURCE}}/commands/ensure_mkcert.ts
 
 @_ensure_npm_modules:
-    if [ ! -f "{{parcel}}" ]; then npm i; fi
+    if [ ! -f "{{tsc}}" ]; then npm i; fi
+
+# vite builder commands
+@_vite +args="":
+    {{vite}} {{args}}
+
+# update "gh-pages" branch with the (versioned and default) current build (./docs) (and keeping all previous versions)
+@_githubpages_publish: _ensure_npm_modules _ensure_deno
+    BASE=$(if [ -f "public/CNAME" ]; then echo ""; else echo "{{PACKAGE_NAME_SHORT}}"; fi) \
+        deno run --unstable --allow-all {{DENO_SOURCE}}/browser/gh-pages-publish-to-docs.ts --versioning=true
+
+@_cloudflare_pages_publish: _ensure_npm_modules _ensure_deno
+    deno run --unstable --allow-all {{DENO_SOURCE}}/browser/gh-pages-publish-to-docs.ts --versioning=true
+
+_ensureGitPorcelain: _ensure_deno
+    #!/usr/bin/env bash
+    set -eo pipefail
+    # In github actions, we modify .github/actions/cloud/action.yml for reasons
+    # so do not do this check there
+    if [ "${GITHUB_WORKSPACE}" = "" ]; then
+        deno run --allow-all --unstable {{DENO_SOURCE}}/git/git-fail-if-uncommitted-files.ts
+    fi
+
+@_require_NPM_TOKEN:
+	if [ -z "{{NPM_TOKEN}}" ]; then echo "Missing NPM_TOKEN env var"; exit 1; fi
+
+_fix_git_actions_permission:
+    #!/usr/bin/env bash
+    set -eo pipefail
+    # workaround for github actions docker permissions issue
+    if [ "${GITHUB_WORKSPACE}" != "" ]; then
+        git config --global --add safe.directory /github/workspace
+        git config --global --add safe.directory /repo
+        git config --global --add safe.directory $(pwd)
+        export GIT_CEILING_DIRECTORIES=/__w
+    fi
+
+_ensure_deno:
+    #!/usr/bin/env bash
+    set -eo pipefail
+    if ! command -v deno &> /dev/null
+    then
+        echo "deno could not be found. Please install: https://deno.land/"
+        exit 1
+    fi
