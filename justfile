@@ -48,7 +48,6 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     set -euo pipefail
     APP_ORIGIN=https://${APP_FQDN}:${APP_PORT}
     echo "Browser development pointing to: ${APP_ORIGIN}"
-    if [ ]
     deno run --allow-all --unstable {{DENO_SOURCE}}/exec/open_url.ts https://metapages.github.io/load-page-when-available/?url=https://${APP_FQDN}:${APP_PORT}
     npm i
     export HOST={{APP_FQDN}}
