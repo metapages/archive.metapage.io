@@ -39,6 +39,10 @@
     "yup": "^0.32.11",
     "zustand": "^4.3.6"
   },
+  "peerDependencies": {
+    "@metapages/metapage": "^0.13",
+    "react": "^16.8.0 || 18.x"
+  },
   "devDependencies": {
     "@types/node": "^14.18.40",
     "@types/object-hash": "^3.0.2",
