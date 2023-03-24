@@ -73,5 +73,5 @@ export const MetaframeStandaloneComponent: React.FC<{
     return <p>...</p>;
   }
 
-  return <MetaframeIframe metaframe={metaframe} style={style} height={height}/>;
+  return <MetaframeIframe metaframe={metaframe} style={style} height={height || "300px"}/>;
 };

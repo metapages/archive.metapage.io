@@ -1,6 +1,16 @@
 import React, { ComponentType, useEffect, useRef } from "react";
 import { MetapageIFrameRpcClient } from "@metapages/metapage";
 
+const defaultIframeContainerStyle : React.CSSProperties = {
+  position: "relative",
+  overflow: "hidden",
+  width: "100%",
+  height: "100%",
+  border: "0",
+  left: "0",
+  top: "0",
+}
+
 export const MetaframeIframe: React.FC<{
   metaframe?: MetapageIFrameRpcClient;
   Wrapper?: ComponentType<any>;
@@ -46,8 +56,6 @@ export const MetaframeIframe: React.FC<{
         // https://stackoverflow.com/questions/18765762/how-to-make-width-and-height-of-iframe-same-as-its-parent-div
         iframe.style.cssText = `overflow:hidden; position:absolute;top:0px;width:100%;height:${
           height ? height : "100%"
-        }; max-height:${
-          height ? height : "100%"
         };`;
 
         ref.current.appendChild(iframe);
@@ -72,7 +80,9 @@ export const MetaframeIframe: React.FC<{
     );
   } else {
     return (
-      <div ref={ref} className="iframe-container" key={metaframe.id} style={{ ...style, ...{height:height, maxHeight:height} }}></div>
+      <div ref={ref} key={metaframe.id} style={{ ...defaultIframeContainerStyle, ...style, ...{height:height} }}></div>
     );
   }
 };
+
+// className="iframe-container"

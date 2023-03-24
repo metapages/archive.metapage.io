@@ -1,0 +1,50 @@
+# just docs: https://github.com/casey/just
+set shell       := ["bash", "-c"]
+set dotenv-load := true
+###########################################################################
+# Build and package
+###########################################################################
+# vite                               := "NODE_OPTIONS='--max_old_space_size=32768' ./node_modules/vite/bin/vite.js"
+vite                               := "./node_modules/vite/bin/vite.js"
+tsc                                := "./node_modules/typescript/bin/tsc"
+###########################################################################
+# Formatting
+###########################################################################
+bold                               := '\033[1m'
+normal                             := '\033[0m'
+green                              := "\\e[32m"
+yellow                             := "\\e[33m"
+blue                               := "\\e[34m"
+magenta                            := "\\e[35m"
+grey                               := "\\e[90m"
+
+@_help:
+    just --list --unsorted --list-heading $'🔳 Commands:\n\n'
+
+dev: _ensure_node_modules
+   npm run dev
+
+# Build the client static files
+build:
+    npm run build
+
+# Rebuild the browser assets in ./dist on changes
+preview:
+    npm run preview
+
+watch:
+    watchexec -w src -- just build
+
+# Delete generated source files
+clean:
+    rm -rf dist
+
+# compile typescript src, may or may not emit artifacts
+_typescript +args="--build": _ensure_node_modules
+    {{tsc}} {{args}}
+
+@_vite +args="": _ensure_node_modules
+    {{vite}} {{args}}
+
+@_ensure_node_modules:
+    if [ ! -d node_modules ]; then npm i; fi
