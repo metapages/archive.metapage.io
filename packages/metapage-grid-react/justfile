@@ -80,8 +80,8 @@ watch:
 @_npm_build: _ensure_npm_modules _ensure_deno
     mkdir -p dist
     rm -rf dist/*
-    {{tsc}} --noEmit false --project ./tsconfig.npm.json
-    vite build
+    {{tsc}}
+    {{vite}} build
     echo "  ✅ npm build"
 
 # bumps version, commits change, git tags
@@ -125,7 +125,7 @@ deploy-tag-version-npm: _require_NPM_TOKEN _npm_build
 
 # compile typescript src, may or may not emit artifacts
 _tsc +args="": _ensure_npm_modules
-    {{tsc}} --noEmit false --project ./tsconfig.npm.json
+    {{tsc}}
 
 # DEV: generate TLS certs for HTTPS over localhost https://blog.filippo.io/mkcert-valid-https-certificates-for-localhost/
 @_mkcert: _ensure_deno
