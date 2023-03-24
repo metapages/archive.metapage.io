@@ -19,7 +19,7 @@ export DOCKER_TAG                  := `if [ "${GITHUB_ACTIONS}" = "true" ]; then
 # The NPM_TOKEN is required for publishing to https://www.npmjs.com
 NPM_TOKEN                          := env_var_or_default("NPM_TOKEN", "")
 # Source of deno scripts. When developing we need to switch this
-DENO_SOURCE                        := env_var_or_default("DENO_SOURCE", "https://deno.land/x/metapages@v0.0.17")
+# DENO_SOURCE                        := env_var_or_default("DENO_SOURCE", "https://deno.land/x/metapages@v0.0.17")
 # vite needs an extra memory boost
 vite                               := "VITE_APP_FQDN=" + APP_FQDN + " VITE_APP_PORT=" + APP_PORT + " NODE_OPTIONS='--max_old_space_size=16384' ./node_modules/vite/bin/vite.js"
 tsc                                := "./node_modules/typescript/bin/tsc"
@@ -37,9 +37,10 @@ grey                               := "\\e[90m"
     echo -e ""
     just --list --unsorted --list-heading $'🌱 Commands:\n\n'
     echo -e ""
-    echo -e "    Github  URL 🔗 {{green}}$(cat package.json | jq -r '.repository.url'){{normal}}"
-    echo -e "    Publish URL 🔗 {{green}}https://$(cat package.json | jq -r '.name' | sd '/.*' '' | sd '@' '').github.io/{{PACKAGE_NAME_SHORT}}/{{normal}}"
     echo -e "    Develop URL 🔗 {{green}}https://{{APP_FQDN}}:{{APP_PORT}}/{{normal}}"
+    echo -e "    Github  URL 🔗 {{green}}$(cat package.json | jq -r '.repository.url'){{normal}}"
+    echo -e "    Publish URL 🔗 {{green}}https://$(cat package.json | jq -r '.homepage'){{normal}}"
+    echo -e "    npm     URL 🔗 {{green}}https://www.npmjs.com/package/$(cat package.json | jq -r '.name')/{{normal}}"
     echo -e ""
 
 # Run the dev server. Opens the web app in browser.
@@ -48,7 +49,7 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     set -euo pipefail
     APP_ORIGIN=https://${APP_FQDN}:${APP_PORT}
     echo "Browser development pointing to: ${APP_ORIGIN}"
-    deno run --allow-all --unstable {{DENO_SOURCE}}/exec/open_url.ts https://metapages.github.io/load-page-when-available/?url=https://${APP_FQDN}:${APP_PORT}
+    deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/exec/open_url.ts https://metapages.github.io/load-page-when-available/?url=https://${APP_FQDN}:${APP_PORT}
     npm i
     export HOST={{APP_FQDN}}
     export PORT={{APP_PORT}}
@@ -57,24 +58,24 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     export BASE=
     VITE_APP_ORIGIN=${APP_ORIGIN} {{vite}} --clearScreen false
 
-# Increment semver version, push the tags (triggers "on-tag-version")
-@publish npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
+# Increment semver version, push the tags (triggers "deploy-tag-version")
+@push-tag-version npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
     # Push the tags up
     git push origin v$(cat package.json | jq -r '.version')
 
-# Publish targets (add to the end of the on-tag-version command to execute):
-#   - `_npm_publish`: publish to npm
-#   - `_githubpages_publish`: publish to github pages
+# Publish targets (add to the end of the deploy-tag-version command to execute):
+#   - `deploy-tag-version-npm`: publish to npm
+#   - `deploy-tag-version-github-pages`: publish to github pages
 #   - `_cloudflare_pages_publish`: publish to cloudflare pages
-# Reaction to "publish". On new git version tag: publish code [github pages, cloudflare pages, npm]
-on-tag-version: _fix_git_actions_permission _ensure_npm_modules _ensureGitPorcelain _githubpages_publish _npm_publish
+# Reaction to "push-tag-version". On new git version tag: publish code [github pages, cloudflare pages, npm]
+deploy-tag-version: _fix_git_actions_permission _ensure_npm_modules _ensureGitPorcelain deploy-tag-version-github-pages deploy-tag-version-npm
 
 # build the browser app in ./docs (default for github pages)
 _browser_client_build BASE="": _ensure_deno
     HOST={{APP_FQDN}} \
     OUTDIR=./docs \
     BASE={{BASE}} \
-        deno run --allow-all --unstable {{DENO_SOURCE}}/browser/vite-build.ts --versioning=true
+        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts --versioning=true
 
 # Test: currently bare minimum: only building. Need proper test harness.
 @test: (_tsc "--build") build
@@ -102,7 +103,7 @@ serve: _mkcert build
     {{tsc}} --noEmit false --project ./tsconfig.npm.json
     OUTDIR=./dist \
     DEPLOY_TARGET=lib \
-        deno run --allow-all --unstable {{DENO_SOURCE}}/browser/vite-build.ts
+        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts
     echo "  ✅ npm build"
 
 # bumps version, commits change, git tags
@@ -111,7 +112,7 @@ serve: _mkcert build
     echo -e "  📦 new version: {{green}}$(cat package.json | jq -r .version){{normal}}"
 
 # If the npm version does not exist, publish the module
-_npm_publish: _require_NPM_TOKEN _npm_build
+deploy-tag-version-npm: _require_NPM_TOKEN _npm_build
     #!/usr/bin/env bash
     set -euo pipefail
     if [ "$CI" != "true" ]; then
@@ -130,13 +131,13 @@ _npm_publish: _require_NPM_TOKEN _npm_build
         PACKAGE_EXISTS=false
     fi
     VERSION=$(cat package.json | jq -r '.version')
-    if [ $PACKAGE_EXISTS = "true" ]; then
-        INDEX=$(npm view $(cat package.json | jq -r .name) versions --json | jq "index( \"$VERSION\" )")
-        if [ "$INDEX" != "null" ]; then
-            echo -e '  🌳 Version exists, not publishing'
-            exit 0
-        fi
-    fi
+    # if [ $PACKAGE_EXISTS = "true" ]; then
+    #     INDEX=$(npm view $(cat package.json | jq -r .name) versions --json | jq "index( \"$VERSION\" )")
+    #     if [ "$INDEX" != "null" ]; then
+    #         echo -e '  🌳 Version exists, not publishing'
+    #         exit 0
+    #     fi
+    # fi
 
     echo -e "  👉 PUBLISHING npm version $VERSION"
     if [ ! -f .npmrc ]; then
@@ -150,7 +151,7 @@ _tsc +args="": _ensure_npm_modules
 
 # DEV: generate TLS certs for HTTPS over localhost https://blog.filippo.io/mkcert-valid-https-certificates-for-localhost/
 @_mkcert: _ensure_deno
-    APP_FQDN={{APP_FQDN}} CERTS_DIR=.certs deno run --allow-all --unstable {{DENO_SOURCE}}/commands/ensure_mkcert.ts
+    APP_FQDN={{APP_FQDN}} CERTS_DIR=.certs deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/commands/ensure_mkcert.ts
 
 @_ensure_npm_modules:
     if [ ! -f "{{tsc}}" ]; then npm i; fi
@@ -160,12 +161,12 @@ _tsc +args="": _ensure_npm_modules
     {{vite}} {{args}}
 
 # update "gh-pages" branch with the (versioned and default) current build (./docs) (and keeping all previous versions)
-@_githubpages_publish: _ensure_npm_modules _ensure_deno
+@deploy-tag-version-github-pages: _ensure_npm_modules _ensure_deno
     BASE=$(if [ -f "public/CNAME" ]; then echo ""; else echo "{{PACKAGE_NAME_SHORT}}"; fi) \
-        deno run --unstable --allow-all {{DENO_SOURCE}}/browser/gh-pages-publish-to-docs.ts --versioning=true
+        deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.17/browser/gh-pages-publish-to-docs.ts --versioning=true
 
 @_cloudflare_pages_publish: _ensure_npm_modules _ensure_deno
-    deno run --unstable --allow-all {{DENO_SOURCE}}/browser/gh-pages-publish-to-docs.ts --versioning=true
+    deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.17/browser/gh-pages-publish-to-docs.ts --versioning=true
 
 _ensureGitPorcelain: _ensure_deno
     #!/usr/bin/env bash
@@ -173,7 +174,7 @@ _ensureGitPorcelain: _ensure_deno
     # In github actions, we modify .github/actions/cloud/action.yml for reasons
     # so do not do this check there
     if [ "${GITHUB_WORKSPACE}" = "" ]; then
-        deno run --allow-all --unstable {{DENO_SOURCE}}/git/git-fail-if-uncommitted-files.ts
+        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/git/git-fail-if-uncommitted-files.ts
     fi
 
 @_require_NPM_TOKEN:

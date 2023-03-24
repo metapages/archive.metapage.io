@@ -27,16 +27,17 @@ export default defineConfig(({ command, mode }) => ({
   resolve: {
     alias: {
       "/@": resolve(__dirname, "./src"),
-      "@metapages/metapage-embed-react": resolve(__dirname, "./lib"),
+      "@metapages/metapage-embed-react": resolve(__dirname, "./src/lib"),
     },
   },
   plugins: [react()],
   build: {
+    copyPublicDir: DEPLOY_TARGET === "lib" ? false : undefined,
     outDir: DEPLOY_TARGET === "lib" ? "dist" : OUTDIR,
     target: "esnext",
     sourcemap: true,
     minify: mode === "development" ? false : "esbuild",
-    emptyOutDir: DEPLOY_TARGET === "glitch" || DEPLOY_TARGET === "lib",
+    emptyOutDir: DEPLOY_TARGET === "glitch",
     lib:
       DEPLOY_TARGET === "lib"
         ? {

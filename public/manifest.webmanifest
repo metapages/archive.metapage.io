@@ -1,6 +1,6 @@
 {
-  "short_name": "metaframe-template",
-  "name": "metaframe-template",
+  "short_name": "metaframe-app",
+  "name": "metaframe-app",
   "icons": [
     {
       "src": "favicon.ico",
