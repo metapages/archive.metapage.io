@@ -1,0 +1,61 @@
+{
+  "name": "@metapages/metapage-grid-react",
+  "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metapages/metapage-app"
+  },
+  "files": [
+    "dist/**/*",
+    "src/lib/**/*"
+  ],
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "./dist/metapage-embed-react.umd.js",
+  "module": "./dist/metapage-embed-react.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/metapage-embed-react.es.js",
+      "require": "./dist/metapage-embed-react.umd.js"
+    }
+  },
+  "homepage": "https://app.metapages.org/",
+  "scripts": {
+    "dev": "../../node_modules/vite/bin/vite.js",
+    "build": "tsc && ../../node_modules/vite/bin/vite.js build",
+    "preview": "../../node_modules/vite/bin/vite.js preview"
+  },
+  "dependencies": {
+    "@metapages/metapage": "^0.13",
+    "object-hash": "^3.0.0",
+    "react-grid-layout": "^1.3.4"
+  },
+  "peerDependencies": {
+    "@metapages/metapage": "^0.13",
+    "react": "^16.8.0 || 18.x"
+  },
+  "devDependencies": {
+    "@types/node": "^14.18.40",
+    "@types/object-hash": "^3.0.2",
+    "@types/react": "^18.0.21",
+    "@types/react-grid-layout": "^1.3.2",
+    "@vitejs/plugin-react": "^3.1.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.2.1",
+    "vite-plugin-dts": "^2.1.0"
+  },
+  "browserslist": {
+    "production": [
+      "last 3 and_chr versions",
+      "last 3 chrome versions",
+      "last 3 opera versions",
+      "last 3 ios_saf versions",
+      "last 3 safari versions"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
