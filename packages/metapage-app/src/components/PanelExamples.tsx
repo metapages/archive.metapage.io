@@ -2,7 +2,7 @@ import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { Box, Card, CardBody, Heading, Link, ListItem, UnorderedList } from '@chakra-ui/react';
 import React from 'react';
 
-import { METAPAGES_GALLERY } from './links';
+import { METAPAGES_GALLERY } from './constants';
 
 export const PanelExamples: React.FC = () => {
   return (

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 
-import { EXTERNAL_DOCS } from "./links";
+import { EXTERNAL_DOCS } from "./constants";
 
 export const PanelDocs: React.FC = () => {
   return (

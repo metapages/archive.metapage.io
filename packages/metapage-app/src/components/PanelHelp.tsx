@@ -30,15 +30,15 @@ export const PanelHelp: React.FC = () => {
 
       <HStack align="flex-start" w="100%">
         <VStack w="50%" align="flex-start">
-          <PanelDocs />
-          <PanelExamples />
-        </VStack>
-        <VStack w="50%" align="flex-start">
-            <Box layerStyle={"textHighlightBox"}>
-              Two ways to embed a metapage:
+            <Box  m={5} w="">
+              <Heading size="sm">Two ways to embed a metapage:</Heading>
             </Box>
           <PanelPasteJson />
           <PanelFromUrl />
+        </VStack>
+        <VStack w="50%" align="flex-start">
+          <PanelDocs />
+          <PanelExamples />
         </VStack>
       </HStack>
     </VStack>

@@ -15,7 +15,7 @@ export const ExampleEmbedMetaframe: React.FC<{
 
   return (
     <VStack p={10}>
-      <Box w="100%" borderWidth="1px" borderRadius="lg" border="blue.500">
+      <Box w="100%" >
         <Text>
           This example shows an editor as an embedded metaframe with outputs handled by react
           hooks
@@ -23,7 +23,7 @@ export const ExampleEmbedMetaframe: React.FC<{
       </Box>
 
       <HStack align="flex-start" w="100%" m={10} p={10}>
-        <Box w="50%" h="90vh">
+        <Box w="50%" h="90vh" borderWidth="1px" borderRadius="lg" border="blue.500" p={2}>
           <MetaframeStandaloneComponent
             url={url}
             inputs={{ value: "starting text" }}

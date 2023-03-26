@@ -1,7 +1,9 @@
-import { CopyIcon, EditIcon } from "@chakra-ui/icons";
-import { MenuItem, useClipboard, useToast } from "@chakra-ui/react";
-import { useCallback, useState } from "react";
-import { metapageDefinitionFromUrl } from "../hooks/metapageDefinitionFromUrl";
+import { MenuItem, useClipboard, useToast } from '@chakra-ui/react';
+import { useCallback, useState } from 'react';
+import { AiOutlineEdit } from 'react-icons/ai';
+
+import { metapageDefinitionFromUrl } from '../../hooks/metapageDefinitionFromUrl';
+import { MENU_ICON_SIZE } from '../constants';
 
 export const MenuButtonEdit: React.FC = () => {
   const [metapageDefinition] = metapageDefinitionFromUrl();
@@ -28,9 +30,9 @@ export const MenuButtonEdit: React.FC = () => {
       // isDisabled={!metapageDefinition}
       isDisabled={true}
       onClick={onclick}
-      icon={<EditIcon />}
+      icon={<AiOutlineEdit size={MENU_ICON_SIZE} />}
     >
-      (Coming Soon!) Edit at https://app.metapage.io
+      (Coming Soon!) Edit
     </MenuItem>
   );
 };

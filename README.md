@@ -1,10 +1,23 @@
 # [Metapage](https://metapages.org/) Viewer Application
 
+Metapage standalone viewer, and metapage react library, for embedding metapages and metaframes
+
+## Open source metapage viewer
+
 https://app.metapages.org/
 
-The website above hosts a metapage application viewer.
+The static website above hosts a metapage application viewer.
 
-You can use the site to run any metapage application.
+You can use the above site to run any metapage application.
+
+## React library for embedding metapages/frames into your own site
+
+Install: `npm i @metapages/metapage-grid-react`
+
+
+
+
+
 
 ## Development
 

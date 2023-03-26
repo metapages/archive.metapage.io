@@ -1,7 +1,15 @@
 import React, { useCallback, useState } from "react";
 import { MetapageGridLayoutFromDefinition } from "@metapages/metapage-grid-react";
-import { MetapageDefinitionV3, MetapageEventDefinition, VersionsMetapage } from "@metapages/metapage";
-import { Box, Tag, Alert, AlertIcon, AlertDescription } from "@chakra-ui/react";
+import { MetapageDefinitionV3, VersionsMetapage } from "@metapages/metapage";
+import {
+  Box,
+  Tag,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 
 const CustomGridItemComponentLabel = React.forwardRef((props: any, ref) => {
   return (
@@ -40,30 +48,44 @@ const CustomErrorDisplay: React.FC<{ error: any }> = ({ error }) => {
 };
 
 export const ExampleEmbedMetapage: React.FC = () => {
-
-
-  const [definition, setDefinition] = useState<MetapageDefinitionV3>(exampleDefinition);
+  const [definition, setDefinition] =
+    useState<MetapageDefinitionV3>(exampleDefinition);
   const onOutputs = (outputs: any) => {
-    // console.log(`Got outputs!! outputs=${JSON.stringify(outputs)}`);
     console.log(`Got outputs!! outputs=${outputs}`);
   };
 
-
-  const onDefinition = useCallback((def: MetapageDefinitionV3) => {
-    setDefinition(def);
-  }, [setDefinition]);
-
+  const onDefinition = useCallback(
+    (def: MetapageDefinitionV3) => {
+      setDefinition(def);
+    },
+    [setDefinition]
+  );
 
   return (
-    <div>
-      <MetapageGridLayoutFromDefinition
-        definition={definition}
-        onOutputs={onOutputs as any}
-        onDefinition={onDefinition}
-        Wrapper={CustomGridItemComponentLabel}
-        ErrorWrapper={CustomErrorDisplay}
-      />
-    </div>
+    <VStack p={10}>
+      <Box w="100%">
+        <Text>
+          This example shows an embedded metapage in a react app, where the
+          metapage is defined from a JSON definition
+        </Text>
+      </Box>
+
+      <Box
+        w="100%"
+        borderWidth="1px"
+        borderRadius="lg"
+        border="blue.500"
+        p={2}
+      >
+        <MetapageGridLayoutFromDefinition
+          definition={definition}
+          onOutputs={onOutputs as any}
+          onDefinition={onDefinition}
+          Wrapper={CustomGridItemComponentLabel}
+          ErrorWrapper={CustomErrorDisplay}
+        />
+      </Box>
+    </VStack>
   );
 };
 

@@ -2,10 +2,8 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import {
   Button,
   IconButton,
-  Link,
   Menu,
   MenuButton,
-  MenuItem,
   MenuList,
   Modal,
   ModalBody,
@@ -17,15 +15,15 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import React from 'react';
-import { AiFillGithub } from "react-icons/ai";
 
+import { OptionsPanel } from '../OptionsPanel';
 import { MenuButtonCopy } from './MenuButtonCopy';
-import { MenuButtonDelete } from './MenuButtonDelete';
+import { MenuButtonHome } from './MenuButtonHome';
 import { MenuButtonDocs } from './MenuButtonDocs';
 import { MenuButtonEdit } from './MenuButtonEdit';
-import { MenuButtonMore } from './MenuButtonMore';
+import { MenuButtonGallery } from './MenuButtonGallery';
+import { MenuButtonGithub } from './MenuButtonGithub';
 import { MenuButtonOptions } from './MenuButtonOptions';
-import { OptionsPanel } from './OptionsPanel';
 
 export const MenuMetapage: React.FC = () => {
   const { isOpen, onClose, onToggle } = useDisclosure();
@@ -41,15 +39,13 @@ export const MenuMetapage: React.FC = () => {
           icon={<HamburgerIcon />}
         />
         <MenuList>
+          <MenuButtonHome />
           <MenuButtonOptions onToggle={onToggle} />
           <MenuButtonCopy />
           <MenuButtonEdit />
-          <MenuButtonDelete />
           <MenuButtonDocs />
-          <MenuButtonMore />
-          <Link href={"https://github.com/metapages/metapage-app"} aria-label="github" isExternal={true}>
-            <MenuItem icon={<AiFillGithub />}>Source</MenuItem>
-          </Link>
+          <MenuButtonGallery />
+          <MenuButtonGithub />
         </MenuList>
       </Menu>
 

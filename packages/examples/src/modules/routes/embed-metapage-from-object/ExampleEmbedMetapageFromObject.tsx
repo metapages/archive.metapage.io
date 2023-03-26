@@ -5,7 +5,16 @@ import {
   MetapageDefinitionV3,
   VersionsMetapage,
 } from "@metapages/metapage";
-import { Box, Tag, Alert, AlertIcon, AlertDescription } from "@chakra-ui/react";
+import {
+  Box,
+  Tag,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  Text,
+  VStack,
+  Code,
+} from "@chakra-ui/react";
 
 const CustomGridItemComponentLabel = React.forwardRef((props: any, ref) => {
   return (
@@ -45,14 +54,24 @@ export const ExampleEmbedMetapageFromObject: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <MetapageGridLayoutFromMetapage
-        metapage={metapage}
-        onOutputs={onOutputs as any}
-        Wrapper={CustomGridItemComponentLabel}
-        ErrorWrapper={CustomErrorDisplay}
-      />
-    </div>
+    <VStack p={10} w="100%">
+      <Box w="100%">
+        <Text>
+          This example shows an embedded metapage in a react app, where the
+          metapage object is passed into the{" "}
+          <Code>MetapageGridLayoutFromMetapage</Code> component
+        </Text>
+      </Box>
+
+      <Box w="100%" borderWidth="1px" borderRadius="lg" border="blue.500" p={2}>
+        <MetapageGridLayoutFromMetapage
+          metapage={metapage}
+          onOutputs={onOutputs as any}
+          Wrapper={CustomGridItemComponentLabel}
+          ErrorWrapper={CustomErrorDisplay}
+        />
+      </Box>
+    </VStack>
   );
 };
 

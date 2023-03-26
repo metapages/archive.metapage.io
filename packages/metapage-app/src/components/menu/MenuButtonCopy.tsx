@@ -1,7 +1,9 @@
-import { CopyIcon } from "@chakra-ui/icons";
-import { MenuItem, useClipboard, useToast } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { metapageDefinitionFromUrl } from "../hooks/metapageDefinitionFromUrl";
+import { MenuItem, useClipboard, useToast } from '@chakra-ui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { AiOutlineCopy } from 'react-icons/ai';
+
+import { metapageDefinitionFromUrl } from '../../hooks/metapageDefinitionFromUrl';
+import { MENU_ICON_SIZE } from '../constants';
 
 export const MenuButtonCopy: React.FC = () => {
   const [metapageDefinition] = metapageDefinitionFromUrl();
@@ -34,7 +36,7 @@ export const MenuButtonCopy: React.FC = () => {
     <MenuItem
       isDisabled={!metapageDefinition}
       onClick={onclick}
-      icon={<CopyIcon />}
+      icon={<AiOutlineCopy size={MENU_ICON_SIZE}/>}
     >
       Copy
     </MenuItem>

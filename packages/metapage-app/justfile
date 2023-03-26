@@ -49,7 +49,7 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     APP_ORIGIN=https://${APP_FQDN}:${APP_PORT}
     echo "Browser development pointing to: ${APP_ORIGIN}"
     deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/exec/open_url.ts https://metapages.github.io/load-page-when-available/?url=https://${APP_FQDN}:${APP_PORT}
-    npm i
+    pushd ../../ && npm i && popd
     export HOST={{APP_FQDN}}
     export PORT={{APP_PORT}}
     export CERT_FILE=.certs/{{APP_FQDN}}.pem
@@ -153,7 +153,9 @@ _tsc +args="": _ensure_npm_modules
     APP_FQDN={{APP_FQDN}} CERTS_DIR=.certs deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/commands/ensure_mkcert.ts
 
 @_ensure_npm_modules:
-    if [ ! -f "{{tsc}}" ]; then npm i; fi
+    if [ ! -f "{{tsc}}" ]; then \
+        pushd ../../ && npm i && popd; \
+    fi
 
 # vite builder commands
 @_vite +args="":
