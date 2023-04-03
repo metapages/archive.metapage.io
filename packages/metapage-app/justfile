@@ -164,10 +164,10 @@ _tsc +args="": _ensure_npm_modules
 # update "gh-pages" branch with the (versioned and default) current build (./docs) (and keeping all previous versions)
 @deploy-tag-version-github-pages: _ensure_npm_modules _ensure_npm_modules
     BASE=$(if [ -f "public/CNAME" ]; then echo ""; else echo "{{PACKAGE_NAME_SHORT}}"; fi) \
-        deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.17/browser/gh-pages-publish-to-docs.ts --versioning=true
+        deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.18/browser/gh-pages-publish-to-docs.ts --versioning=true
 
 @_cloudflare_pages_publish: _ensure_npm_modules _ensure_deno
-    deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.17/browser/gh-pages-publish-to-docs.ts --versioning=true
+    deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.18/browser/gh-pages-publish-to-docs.ts --versioning=true
 
 _ensureGitPorcelain: _ensure_deno
     #!/usr/bin/env bash
