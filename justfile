@@ -19,10 +19,9 @@ grey                               := "\\e[90m"
     echo -e ""
     just --list --unsorted --list-heading $'🌱 Commands:\n\n'
     echo -e ""
-    echo -e "    Develop URL 🔗 {{green}}https://{{APP_FQDN}}:{{APP_PORT}}/{{normal}}"
-    echo -e "    Github  URL 🔗 {{green}}$(cat package.json | jq -r '.repository.url'){{normal}}"
-    echo -e "    Publish URL 🔗 {{green}}https://$(cat package.json | jq -r '.homepage'){{normal}}"
-    echo -e "    npm     URL 🔗 {{green}}https://www.npmjs.com/package/$(cat package.json | jq -r '.name')/{{normal}}"
+    echo -e "    Github  URL 🔗 {{green}}$(cat packages/metapage-app/package.json | jq -r '.repository.url'){{normal}}"
+    echo -e "    Publish URL 🔗 {{green}}https://$(cat packages/metapage-app/package.json | jq -r '.homepage'){{normal}}"
+    echo -e "    npm     URL 🔗 {{green}}https://www.npmjs.com/package/$(cat packages/metapage-app/package.json | jq -r '.name')/{{normal}}"
     echo -e ""
 
 # Run the metapage-app dev server. Opens the web app in browser.
