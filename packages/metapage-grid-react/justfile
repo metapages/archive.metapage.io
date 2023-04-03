@@ -53,7 +53,10 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
 # Increment semver version, push the tags (triggers "deploy-tag-version")
 @tag-version npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
     # Push the tags up
-    # git push origin v$(cat package.json | jq -r '.version')
+    # npm workspaces stops auto git tagging on 'npm version'
+    # so we have to manually git tag https://github.com/npm/cli/issues/4017#issuecomment-1101481619
+    git tag v$(cat package.json | jq -r '.version')
+    git push origin v$(cat package.json | jq -r '.version')
 
 # Publish targets (add to the end of the deploy-tag-version command to execute):
 #   - `deploy-tag-version-npm`: publish to npm
