@@ -32,7 +32,6 @@ blue                               := "\\e[34m"
 magenta                            := "\\e[35m"
 grey                               := "\\e[90m"
 
-# If not in docker, get inside
 @_help:
     echo -e ""
     just --list --unsorted --list-heading $'🌱 Commands:\n\n'
