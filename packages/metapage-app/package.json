@@ -24,7 +24,7 @@
     "@emotion/styled": "^11.10.4",
     "@metapages/hash-query": "^0.4.5",
     "@metapages/metaframe-hook": "^1.0.11",
-    "@metapages/metapage-grid-react": "0.2.0",
+    "@metapages/metapage-grid-react": "^0.2",
     "@metapages/metapage": "^0.13.5",
     "formik": "^2.2.9",
     "framer-motion": "^7.3.6",
