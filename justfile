@@ -59,7 +59,7 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     VITE_APP_ORIGIN=${APP_ORIGIN} {{vite}} --clearScreen false
 
 # Increment semver version, push the tags (triggers "deploy-tag-version")
-@push-tag-version npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
+@tag-version npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
     # Push the tags up
     git push origin v$(cat package.json | jq -r '.version')
 
@@ -67,7 +67,7 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
 #   - `deploy-tag-version-npm`: publish to npm
 #   - `deploy-tag-version-github-pages`: publish to github pages
 #   - `_cloudflare_pages_publish`: publish to cloudflare pages
-# Reaction to "push-tag-version". On new git version tag: publish code [github pages, cloudflare pages, npm]
+# Reaction to "tag-version". On new git version tag: publish code [github pages, cloudflare pages, npm]
 deploy-tag-version: _fix_git_actions_permission _ensure_npm_modules _ensureGitPorcelain deploy-tag-version-github-pages deploy-tag-version-npm
 
 # build the browser app in ./docs (default for github pages)
