@@ -96,14 +96,14 @@ serve: _mkcert build
     npx http-server --cors '*' -a {{APP_FQDN}} -p {{APP_PORT}} --ssl --cert ../.certs/{{APP_FQDN}}.pem --key ../.certs/{{APP_FQDN}}-key.pem
 
 # Build npm package for publishing
-@_npm_build: _ensure_npm_modules _ensure_deno
-    mkdir -p dist
-    rm -rf dist/*
-    {{tsc}} --noEmit false --project ./tsconfig.npm.json
-    OUTDIR=./dist \
-    DEPLOY_TARGET=lib \
-        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts
-    echo "  ✅ npm build"
+# @_npm_build: _ensure_npm_modules _ensure_deno
+#     mkdir -p dist
+#     rm -rf dist/*
+#     {{tsc}} --noEmit false --project ./tsconfig.npm.json
+#     OUTDIR=./dist \
+#     DEPLOY_TARGET=lib \
+#         deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts
+#     echo "  ✅ npm build"
 
 # bumps version, commits change, git tags
 @_npm_version npmversionargs="patch":
@@ -111,38 +111,38 @@ serve: _mkcert build
     echo -e "  📦 new version: {{green}}$(cat package.json | jq -r .version){{normal}}"
 
 # If the npm version does not exist, publish the module
-deploy-tag-version-npm: _require_NPM_TOKEN _npm_build
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if [ "$CI" != "true" ]; then
-        # This check is here to prevent publishing if there are uncommitted changes, but this check does not work in CI environments
-        # because it starts as a clean checkout and git is not installed and it is not a full checkout, just the tip
-        if [[ $(git status --short) != '' ]]; then
-            git status
-            echo -e '💥 Cannot publish with uncommitted changes'
-            exit 2
-        fi
-    fi
+# deploy-tag-version-npm: _require_NPM_TOKEN _npm_build
+#     #!/usr/bin/env bash
+#     set -euo pipefail
+#     if [ "$CI" != "true" ]; then
+#         # This check is here to prevent publishing if there are uncommitted changes, but this check does not work in CI environments
+#         # because it starts as a clean checkout and git is not installed and it is not a full checkout, just the tip
+#         if [[ $(git status --short) != '' ]]; then
+#             git status
+#             echo -e '💥 Cannot publish with uncommitted changes'
+#             exit 2
+#         fi
+#     fi
 
-    PACKAGE_EXISTS=true
-    if npm search $(cat package.json | jq -r .name) | grep -q  "No matches found"; then
-        echo -e "  👉 new npm module !"
-        PACKAGE_EXISTS=false
-    fi
-    VERSION=$(cat package.json | jq -r '.version')
-    # if [ $PACKAGE_EXISTS = "true" ]; then
-    #     INDEX=$(npm view $(cat package.json | jq -r .name) versions --json | jq "index( \"$VERSION\" )")
-    #     if [ "$INDEX" != "null" ]; then
-    #         echo -e '  🌳 Version exists, not publishing'
-    #         exit 0
-    #     fi
-    # fi
+#     PACKAGE_EXISTS=true
+#     if npm search $(cat package.json | jq -r .name) | grep -q  "No matches found"; then
+#         echo -e "  👉 new npm module !"
+#         PACKAGE_EXISTS=false
+#     fi
+#     VERSION=$(cat package.json | jq -r '.version')
+#     # if [ $PACKAGE_EXISTS = "true" ]; then
+#     #     INDEX=$(npm view $(cat package.json | jq -r .name) versions --json | jq "index( \"$VERSION\" )")
+#     #     if [ "$INDEX" != "null" ]; then
+#     #         echo -e '  🌳 Version exists, not publishing'
+#     #         exit 0
+#     #     fi
+#     # fi
 
-    echo -e "  👉 PUBLISHING npm version $VERSION"
-    if [ ! -f .npmrc ]; then
-        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-    fi
-    npm publish --access public .
+#     echo -e "  👉 PUBLISHING npm version $VERSION"
+#     if [ ! -f .npmrc ]; then
+#         echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+#     fi
+#     npm publish --access public .
 
 # compile typescript src, may or may not emit artifacts
 _tsc +args="": _ensure_npm_modules
@@ -162,7 +162,7 @@ _tsc +args="": _ensure_npm_modules
     {{vite}} {{args}}
 
 # update "gh-pages" branch with the (versioned and default) current build (./docs) (and keeping all previous versions)
-@deploy-tag-version-github-pages: _ensure_npm_modules _ensure_deno
+@deploy-tag-version-github-pages: _ensure_npm_modules _ensure_npm_modules
     BASE=$(if [ -f "public/CNAME" ]; then echo ""; else echo "{{PACKAGE_NAME_SHORT}}"; fi) \
         deno run --unstable --allow-all https://deno.land/x/metapages@v0.0.17/browser/gh-pages-publish-to-docs.ts --versioning=true
 
