@@ -74,7 +74,7 @@ _browser_client_build BASE="": _ensure_deno
     HOST={{APP_FQDN}} \
     OUTDIR=./docs \
     BASE={{BASE}} \
-        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts --versioning=true
+        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.18/browser/vite-build.ts --versioning=true
 
 # Test: currently bare minimum: only building. Need proper test harness.
 @test: (_tsc "--build") build
