@@ -8,7 +8,7 @@ name: deploy-tag-version
 on:
   push:
     tags:
-      - "v*"
+      - "DISABLEDv*"
 
 env:
   DOCKER_COMPOSE_VERSION: 1.25.4
