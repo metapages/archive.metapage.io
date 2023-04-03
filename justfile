@@ -19,9 +19,9 @@ grey                               := "\\e[90m"
     echo -e ""
     just --list --unsorted --list-heading $'🌱 Commands:\n\n'
     echo -e ""
-    echo -e "    Github  URL 🔗 {{green}}$(cat packages/metapage-app/package.json | jq -r '.repository.url'){{normal}}"
-    echo -e "    Publish URL 🔗 {{green}}https://$(cat packages/metapage-app/package.json | jq -r '.homepage'){{normal}}"
-    echo -e "    npm     URL 🔗 {{green}}https://www.npmjs.com/package/$(cat packages/metapage-app/package.json | jq -r '.name')/{{normal}}"
+    echo -e "    Github  URL 🔗 {{green}}$(cat packages/metapage-grid-react/package.json | jq -r '.repository.url'){{normal}}"
+    echo -e "    Publish URL 🔗 {{green}}https://$(cat packages/metapage-grid-react/package.json | jq -r '.homepage'){{normal}}"
+    echo -e "    npm     URL 🔗 {{green}}https://www.npmjs.com/package/$(cat packages/metapage-grid-react/package.json | jq -r '.name')/{{normal}}"
     echo -e ""
 
 # Run the metapage-app dev server. Opens the web app in browser.
@@ -34,7 +34,7 @@ dev-examples:
 
 # Increment semver version, push the tags (triggers "deploy-tag-version")
 @tag-version npmversionargs="patch":
-    just packages/metapage-app/tag-version {{npmversionargs}}
+    just packages/metapage-grid-react/tag-version {{npmversionargs}}
 
 # Publish targets (add to the end of the deploy-tag-version command to execute):
 #   - `deploy-tag-version-npm`: publish to npm
