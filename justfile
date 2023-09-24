@@ -192,6 +192,8 @@ _fix_git_actions_permission:
         git config --global --add safe.directory /repo
         git config --global --add safe.directory $(pwd)
         export GIT_CEILING_DIRECTORIES=/__w
+        git config --global user.email "robot@metapage.io"
+        git config --global user.name "Metaframe Robot"
     fi
 
 _ensure_deno:
