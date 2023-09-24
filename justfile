@@ -10,7 +10,7 @@ export APP_FQDN                    := env_var_or_default("APP_FQDN", "metaframe1
 export APP_PORT                    := env_var_or_default("APP_PORT", "4430")
 ROOT                               := env_var_or_default("GITHUB_WORKSPACE", `(which git >/dev/null && git rev-parse --show-toplevel) || pwd`)
 export CI                          := env_var_or_default("CI", "")
-PACKAGE_NAME_SHORT                 := file_name(`cat package.json | jq -r '.name' | sd '.*/' ''`)
+PACKAGE_NAME_SHORT                 := file_name(`cat package.json | jq -r '.name' | sed 's/.*\///'`)
 # Store the CI/dev docker image in github
 # ghcr.io packages cannot have more than one "/" after the organization name
 export DOCKER_IMAGE_PREFIX         := "ghcr.io/metapages/" + PACKAGE_NAME_SHORT
