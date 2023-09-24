@@ -1,10 +1,24 @@
-import { Box, Button, Card, CardBody, Spinner, useToast } from '@chakra-ui/react';
+import React, {
+  useCallback,
+  useState,
+} from 'react';
+
+import {
+  Box,
+  Button,
+  Spinner,
+  useToast,
+  VStack,
+} from '@chakra-ui/react';
 import { MetaframeInputMap } from '@metapages/metapage';
-import React, { useCallback, useState } from 'react';
 
 import { metapageDefinitionFromUrl } from '../hooks/metapageDefinitionFromUrl';
-import { usePasteMetapageDefinition } from '../hooks/usePasteMetapageDefinition';
-import { MetaframeStandaloneComponent } from '../lib/components/MetaframeStandaloneComponent';
+import {
+  usePasteMetapageDefinition,
+} from '../hooks/usePasteMetapageDefinition';
+import {
+  MetaframeStandaloneComponent,
+} from '../lib/components/MetaframeStandaloneComponent';
 
 // change this if developing locally the root site to the demo metapages
 const METAPAGES_ORG = "https://metapages.org/";
@@ -22,10 +36,10 @@ export const PanelPasteJson: React.FC = () => {
 
   const onOutputs = useCallback(
     (outputs: MetaframeInputMap) => {
-      if (outputs["value"] === undefined || outputs["value"] === null) {
+      if (outputs["text"] === undefined || outputs["text"] === null) {
         return;
       }
-      setMetapageJsonInEditor(outputs["value"]);
+      setMetapageJsonInEditor(outputs["text"]);
     },
     [setMetapageJsonInEditor]
   );
@@ -47,31 +61,29 @@ export const PanelPasteJson: React.FC = () => {
   }, [metapageJsonInEditor, useToast]);
 
   return (
-    <Card w="100%">
-      <CardBody>
-        <Box layerStyle={"textHighlightBox"}>
-          1. Paste metapage JSON from the clipboard and this page will show the
-          metapage
-        </Box>
+    <VStack w="100%" align="flex-start">
+      <Box>
+        Paste metapage JSON from the clipboard and this page will show the
+        metapage
+      </Box>
 
-        <Box w="100%" h="500px">
-          {metapageDefinition ? (
-            <Spinner />
-          ) : (
-            <MetaframeStandaloneComponent
-              url="https://editor.mtfm.io/#?options=eyJhdXRvc2VuZCI6dHJ1ZSwiaGlkZW1lbnVpZmlmcmFtZSI6dHJ1ZSwibW9kZSI6Impzb24iLCJ0aGVtZSI6ImxpZ2h0In0="
-              inputs={{ value: metapageJsonInEditor }}
-              onOutputs={onOutputs}
-              height="500px"
-            />
-          )}
-        </Box>
+      <Button colorScheme="blue" variant="outline" onClick={onClick}>
+        Load and show metapage
+      </Button>
 
-        <Button colorScheme="blue" onClick={onClick}>
-          Load
-        </Button>
-      </CardBody>
-    </Card>
+      <Box w="100%" h="80vh">
+        {metapageDefinition ? (
+          <Spinner />
+        ) : (
+          <MetaframeStandaloneComponent
+            url="https://editor.mtfm.io/#?hm=disabled&options=JTdCJTIyYXV0b3NlbmQlMjIlM0F0cnVlJTJDJTIybW9kZSUyMiUzQSUyMmpzb24lMjIlMkMlMjJzYXZlbG9hZGluaGFzaCUyMiUzQWZhbHNlJTJDJTIydGhlbWUlMjIlM0ElMjJsaWdodCUyMiU3RA=="
+            inputs={{ text: metapageJsonInEditor }}
+            onOutputs={onOutputs}
+            height="80vh"
+          />
+        )}
+      </Box>
+    </VStack>
   );
 };
 
@@ -127,7 +139,7 @@ const exampleJson = JSON.stringify(
     },
     plugins: [
       "https://metapages.org/metaframes/mermaid.js/?TITLE=0",
-      "https://editor.mtfm.io/#?options=eyJtb2RlIjoianNvbiIsInNhdmVsb2FkaW5oYXNoIjpmYWxzZSwidGhlbWUiOiJ2cy1kYXJrIn0=",
+      "https://editor.mtfm.io/#?hm=disabled&options=JTdCJTIybW9kZSUyMiUzQSUyMmpzb24lMjIlMkMlMjJzYXZlbG9hZGluaGFzaCUyMiUzQWZhbHNlJTJDJTIydGhlbWUlMjIlM0ElMjJsaWdodCUyMiU3RA==",
     ],
   },
   null,

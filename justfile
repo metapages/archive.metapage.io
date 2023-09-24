@@ -58,6 +58,9 @@ dev: _mkcert _ensure_npm_modules (_tsc "--build") _ensure_deno
     export BASE=
     VITE_APP_ORIGIN=${APP_ORIGIN} {{vite}} --clearScreen false
 
+generate-readme-from-notion:
+    NOTION_PAGE_ID="https://www.notion.so/metapages/README-md-app-metapages-org-0409b49d00fe4978bf230625e971ccb8?pvs=4" just ~/dev/git/metapages/cetami.io/api/functions/notion-page-to-markdown {{justfile_directory()}}/public README.md
+
 # Increment semver version, push the tags (triggers "deploy-tag-version")
 @push-tag-version npmversionargs="patch": _fix_git_actions_permission _ensureGitPorcelain (_npm_version npmversionargs)
     # Push the tags up

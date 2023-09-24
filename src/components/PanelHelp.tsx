@@ -1,46 +1,30 @@
+import React from 'react';
+
 import {
   Box,
   Card,
   CardBody,
-  Heading,
   HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import React from "react";
+} from '@chakra-ui/react';
 
-import { PanelExamples } from "./PanelExamples";
-import { PanelFromUrl } from "./PanelFromUrl";
-import { PanelDocs } from "./PanelDocs";
-import { PanelPasteJson } from "./PanelPasteJson";
+import { PanelPasteJson } from './PanelPasteJson';
 
 export const PanelHelp: React.FC = () => {
   return (
-    <VStack align="flex-start" w="100%">
-
-        <Card w="100%">
-          <CardBody>
-            <Heading size="sm">
-              A metapage is a browser application composed of connected
-              websites, completely encoded into the URL
-            </Heading>
-          </CardBody>
-        </Card>
-
-
-      <HStack align="flex-start" w="100%">
-        <VStack w="50%" align="flex-start">
-          <PanelDocs />
-          <PanelExamples />
-        </VStack>
-        <VStack w="50%" align="flex-start">
-            <Box layerStyle={"textHighlightBox"}>
-              Two ways to embed a metapage:
-            </Box>
+    <HStack align="space-evenly" w="100%">
+      <Card w="100%">
+        <CardBody>
           <PanelPasteJson />
-          <PanelFromUrl />
-        </VStack>
-      </HStack>
-    </VStack>
+        </CardBody>
+      </Card>
+      <Box className="iframe-container"  w="100%">
+        <iframe
+          className="iframe"
+          // In this case only, we are used to display our own help
+          src={`https://markdown.mtfm.io/#?hm=disabled&url=${window.location.origin}${window.location.pathname}/README.md`}
+        />
+      </Box>
+
+    </HStack>
   );
 };
