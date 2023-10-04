@@ -24,6 +24,7 @@ import {
 const METAPAGES_ORG = "https://metapages.org/";
 
 export const PanelPasteJson: React.FC = () => {
+
   // this panel allows pasting in new metapage JSON
   usePasteMetapageDefinition();
   const [metapageDefinition, setMetapageDefinition] =
@@ -46,7 +47,6 @@ export const PanelPasteJson: React.FC = () => {
 
   const onClick = useCallback(() => {
     try {
-      console.log(`type ${typeof metapageJsonInEditor}`);
       setMetapageDefinition(metapageJsonInEditor);
     } catch (err) {
       toast({
@@ -138,7 +138,7 @@ const exampleJson = JSON.stringify(
       },
     },
     plugins: [
-      "https://metapages.org/metaframes/mermaid.js/?TITLE=0",
+      "https://mermaid.mtfm.io/#?hm=disabled",
       "https://editor.mtfm.io/#?hm=disabled&options=JTdCJTIybW9kZSUyMiUzQSUyMmpzb24lMjIlMkMlMjJzYXZlbG9hZGluaGFzaCUyMiUzQWZhbHNlJTJDJTIydGhlbWUlMjIlM0ElMjJsaWdodCUyMiU3RA==",
     ],
   },

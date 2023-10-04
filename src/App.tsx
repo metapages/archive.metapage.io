@@ -1,3 +1,9 @@
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+
 /**
  * Data flow:
  *  - if hash parameter "url" for a url to a metapage.json file
@@ -20,22 +26,31 @@ import {
   TabPanels,
   Tabs,
   VStack,
-} from "@chakra-ui/react";
-import { useHashParamBoolean } from "@metapages/hash-query";
-import { Metapage, MetapageDefinitionV3 } from "@metapages/metapage";
-import React, { useCallback, useEffect, useState } from "react";
+} from '@chakra-ui/react';
+import { useHashParamBoolean } from '@metapages/hash-query';
+import {
+  Metapage,
+  MetapageDefinitionV3,
+} from '@metapages/metapage';
 
-import { AlertBlob, Message } from "./components/Message";
-import { MenuMetapage } from "./components/MenuMetapage";
+import { MenuMetapage } from './components/MenuMetapage';
+import {
+  AlertBlob,
+  Message,
+} from './components/Message';
 import {
   OptionKeyDisableLayoutEdit,
   OptionKeyHideHeader,
-} from "./components/OptionsPanel";
-import { PanelHelp } from "./components/PanelHelp";
-import { getPluginTabs, TabData, TabItem } from "./hooks/getPluginTabs";
-import { metapageDefinitionFromUrl } from "./hooks/metapageDefinitionFromUrl";
-import { MetapageGridLayoutFromDefinition } from "./lib";
-import { CustomGridItemComponentLabel } from "./CustomGridItemComponentLabel";
+} from './components/OptionsPanel';
+import { PanelHelp } from './components/PanelHelp';
+import { CustomGridItemComponentLabel } from './CustomGridItemComponentLabel';
+import {
+  getPluginTabs,
+  TabData,
+  TabItem,
+} from './hooks/getPluginTabs';
+import { metapageDefinitionFromUrl } from './hooks/metapageDefinitionFromUrl';
+import { MetapageGridLayoutFromDefinition } from './lib';
 
 export const App: React.FC = () => {
   const [alert, setAlert] = useState<AlertBlob | undefined>(undefined);
@@ -103,6 +118,7 @@ export const App: React.FC = () => {
   // Otherwise it's the main help page with various alerts etc
   const mainAlert = getAlert();
 
+  
   if (hideHeader) {
     return (
       <VStack w="100%" h="100vh" alignItems="flex-start">
@@ -123,8 +139,6 @@ export const App: React.FC = () => {
       <Tabs
         defaultIndex={0}
         align="end"
-        isLazy={false}
-        isManual={true}
         variant="enclosed"
       >
         <TabList>
@@ -138,13 +152,15 @@ export const App: React.FC = () => {
           {pluginTabData.map((tab: TabItem, index: number) => (
             <Tab key={index + 1}>{tab.label}</Tab>
           ))}
+
         </TabList>
         <TabPanels>
           {finalTabData.map((tab: TabItem, index: number) => (
-            <TabPanel p={2} key={index}>
+            <TabPanel p={2} key={index + 1}>
               {tab.content}
             </TabPanel>
           ))}
+
         </TabPanels>
       </Tabs>
     </div>

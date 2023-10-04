@@ -105,9 +105,12 @@ serve: _mkcert build
     rm -rf dist/*
     {{tsc}} --noEmit false --project ./tsconfig.npm.json
     OUTDIR=./dist \
-    DEPLOY_TARGET=lib \
-        deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts
+    # DEPLOY_TARGET=lib \
+    #     deno run --allow-all --unstable https://deno.land/x/metapages@v0.0.17/browser/vite-build.ts
     echo "  ✅ npm build"
+
+types-npm:
+    {{tsc}} --noEmit false --project ./tsconfig.npm.json
 
 # bumps version, commits change, git tags
 @_npm_version npmversionargs="patch":
