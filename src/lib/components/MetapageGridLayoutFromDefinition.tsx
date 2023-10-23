@@ -1,6 +1,20 @@
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
+import React, {
+  ComponentType,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import hash from 'object-hash';
+import GridLayout, {
+  Layout,
+  WidthProvider,
+} from 'react-grid-layout';
+
 import {
   Metapage,
   MetapageDefinitionV3,
@@ -9,9 +23,6 @@ import {
   MetapageInstanceInputs,
   pageLoaded,
 } from '@metapages/metapage';
-import hash from 'object-hash';
-import React, { ComponentType, useCallback, useEffect, useRef, useState } from 'react';
-import GridLayout, { Layout, WidthProvider } from 'react-grid-layout';
 
 import { MetaframeIframe } from './MetaframeIframe';
 
@@ -288,7 +299,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
                   key={metaframeId}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
                   height={`${
-                    rowHeight * layout.find((v) => v.i === metaframeId)!.h
+                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
                   }px`}
                 />
               </Wrapper>
@@ -297,7 +308,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
                 <MetaframeIframe
                   key={metaframeId}
                   height={`${
-                    rowHeight * layout.find((v) => v.i === metaframeId)!.h
+                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
                   }px`}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
                 />

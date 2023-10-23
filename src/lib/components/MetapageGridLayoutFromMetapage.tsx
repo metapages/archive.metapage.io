@@ -4,20 +4,23 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from "react";
+} from 'react';
+
+import { Layout } from 'react-grid-layout';
+
 import {
   Metapage,
   MetapageDefinitionV3,
   MetapageEventDefinition,
   MetapageEvents,
   MetapageInstanceInputs,
-} from "@metapages/metapage";
-import { Layout } from "react-grid-layout";
-import { MetaframeIframe } from "./MetaframeIframe";
+} from '@metapages/metapage';
+
+import { MetaframeIframe } from './MetaframeIframe';
 import {
   DEFAULT_ROW_HEIGHT,
   ResizingGridLayout,
-} from "./MetapageGridLayoutFromDefinition";
+} from './MetapageGridLayoutFromDefinition';
 
 /**
  * Create a grid layout metapage from a metapage object
@@ -196,7 +199,7 @@ export const MetapageGridLayoutFromMetapage: React.FC<{
                   key={metaframeId}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
                   height={`${
-                    rowHeight * layout.find((v) => v.i === metaframeId)!.h
+                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
                   }px`}
                 />
               </Wrapper>
@@ -205,7 +208,7 @@ export const MetapageGridLayoutFromMetapage: React.FC<{
                 <MetaframeIframe
                   key={metaframeId}
                   height={`${
-                    rowHeight * layout.find((v) => v.i === metaframeId)!.h
+                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
                   }px`}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
                 />
