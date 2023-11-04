@@ -1,3 +1,7 @@
+import React from 'react';
+
+import { AiFillGithub } from 'react-icons/ai';
+
 import { HamburgerIcon } from '@chakra-ui/icons';
 import {
   Button,
@@ -16,10 +20,9 @@ import {
   ModalOverlay,
   useDisclosure,
 } from '@chakra-ui/react';
-import React from 'react';
-import { AiFillGithub } from "react-icons/ai";
 
-import { MenuButtonCopy } from './MenuButtonCopy';
+import { MenuButtonCopyDefinition } from './MenuButtonCopyDefinition';
+import { MenuButtonCopyUrl } from './MenuButtonCopyUrl';
 import { MenuButtonDelete } from './MenuButtonDelete';
 import { MenuButtonDocs } from './MenuButtonDocs';
 import { MenuButtonEdit } from './MenuButtonEdit';
@@ -42,7 +45,8 @@ export const MenuMetapage: React.FC = () => {
         />
         <MenuList>
           <MenuButtonOptions onToggle={onToggle} />
-          <MenuButtonCopy />
+          <MenuButtonCopyDefinition />
+          <MenuButtonCopyUrl/>
           <MenuButtonEdit />
           <MenuButtonDelete />
           <MenuButtonDocs />

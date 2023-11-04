@@ -33,6 +33,7 @@ import {
   MetapageDefinitionV3,
 } from '@metapages/metapage';
 
+import { ButtonGotoExternalLink } from './components/ButtonGotoExternalLink';
 import { MenuMetapage } from './components/MenuMetapage';
 import {
   AlertBlob,
@@ -125,6 +126,7 @@ export const App: React.FC = () => {
         <HStack p={1} w="100%" justifyContent="space-between">
           <MetapageHeader />
           <Spacer />
+          <ButtonGotoExternalLink/>
           <MenuMetapage />
         </HStack>
         <Box p={1} w="100%" alignContent="stretch">
@@ -142,7 +144,7 @@ export const App: React.FC = () => {
         variant="enclosed"
       >
         <TabList>
-          <MenuMetapage />
+          
           <Tab key={0}>
             <MetapageHeader />
           </Tab>
@@ -152,6 +154,8 @@ export const App: React.FC = () => {
           {pluginTabData.map((tab: TabItem, index: number) => (
             <Tab key={index + 1}>{tab.label}</Tab>
           ))}
+          <ButtonGotoExternalLink/>
+          <MenuMetapage />
 
         </TabList>
         <TabPanels>
