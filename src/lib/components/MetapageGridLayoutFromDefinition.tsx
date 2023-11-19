@@ -24,7 +24,7 @@ import {
   pageLoaded,
 } from '@metapages/metapage';
 
-import { MetaframeIframe } from './MetaframeIframe';
+import { MetaframeIframe } from './MetaframeIframe.js';
 
 export const ResizingGridLayout = WidthProvider(GridLayout);
 export const DEFAULT_ROW_HEIGHT = 100;

@@ -1,7 +1,8 @@
-import fs from "fs";
-import { resolve } from "path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import fs from 'fs';
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
+
+import react from '@vitejs/plugin-react';
 
 type DeployTargetType = "glitch" | "lib";
 // values acted on: [glitch | lib]

@@ -16,11 +16,11 @@ import {
   MetapageInstanceInputs,
 } from '@metapages/metapage';
 
-import { MetaframeIframe } from './MetaframeIframe';
+import { MetaframeIframe } from './MetaframeIframe.js';
 import {
   DEFAULT_ROW_HEIGHT,
   ResizingGridLayout,
-} from './MetapageGridLayoutFromDefinition';
+} from './MetapageGridLayoutFromDefinition.js';
 
 /**
  * Create a grid layout metapage from a metapage object

@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
 import {
   MetaframeInputMap,
   Metapage,
   MetapageIFrameRpcClient,
-} from "@metapages/metapage";
-import { MetaframeIframe } from "./MetaframeIframe";
+} from '@metapages/metapage';
+
+import { MetaframeIframe } from './MetaframeIframe.js';
 
 const MetaPageTemplate = {
   version: "0.3",

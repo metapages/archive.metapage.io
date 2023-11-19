@@ -1,5 +1,11 @@
-export { MetaframeStandaloneComponent } from './components/MetaframeStandaloneComponent';
-export { MetaframeIframe } from './components/MetaframeIframe';
-export { MetaframeView } from './components/MetaframeView';
-export { MetapageGridLayoutFromMetapage } from './components/MetapageGridLayoutFromMetapage';
-export { MetapageGridLayoutFromDefinition } from './components/MetapageGridLayoutFromDefinition';
+export {
+  MetaframeStandaloneComponent,
+} from './components/MetaframeStandaloneComponent.js';
+export { MetaframeIframe } from './components/MetaframeIframe.js';
+export { MetaframeView } from './components/MetaframeView.js';
+export {
+  MetapageGridLayoutFromMetapage,
+} from './components/MetapageGridLayoutFromMetapage.js';
+export {
+  MetapageGridLayoutFromDefinition,
+} from './components/MetapageGridLayoutFromDefinition.js';
