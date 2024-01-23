@@ -6,14 +6,17 @@ import React, {
 
 import { MetapageIFrameRpcClient } from '@metapages/metapage';
 
-export const MetaframeIframe: React.FC<{
-  metaframe?: MetapageIFrameRpcClient;
-  Wrapper?: ComponentType<any>;
+export type MetaframeIframeStyleProps = {
   style?: React.CSSProperties;
   styleWrapper?: React.CSSProperties;
   className?: string;
   classNameWrapper?: string;
-}> = ({ metaframe, Wrapper, style, styleWrapper, className, classNameWrapper }) => {
+}
+
+export const MetaframeIframe: React.FC<{
+  metaframe?: MetapageIFrameRpcClient;
+  Wrapper?: ComponentType<any>;
+} & MetaframeIframeStyleProps> = ({ metaframe, Wrapper, style={}, styleWrapper={}, className, classNameWrapper }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

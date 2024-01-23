@@ -24,7 +24,10 @@ import {
   pageLoaded,
 } from '@metapages/metapage';
 
-import { MetaframeIframe } from './MetaframeIframe.js';
+import {
+  MetaframeIframe,
+  MetaframeIframeStyleProps,
+} from './MetaframeIframe.js';
 
 export const ResizingGridLayout = WidthProvider(GridLayout);
 export const DEFAULT_ROW_HEIGHT = 100;
@@ -43,6 +46,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
   ErrorWrapper?: ComponentType<any>;
   debug?: boolean;
   disableEditing?: boolean;
+  metaframeStyleProps?: MetaframeIframeStyleProps;
 }> = ({
   onMetapage,
   definition,
@@ -52,6 +56,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
   disableEditing,
   debug,
   Wrapper,
+  metaframeStyleProps,
   onMetapageError,
   ErrorWrapper,
 }) => {
@@ -304,10 +309,11 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
                 <MetaframeIframe
                   key={metaframeId}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
-                  className="borderFatSolidGreen"
+                  {...metaframeStyleProps}
                   style={{
                     height:`100%`,
                     overflow: "clip", // instead of "scroll"
+                    ...metaframeStyleProps?.style,
                   }}
                 />
               </Wrapper>
@@ -315,9 +321,11 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
                 <MetaframeIframe
                   key={metaframeId}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
+                  {...metaframeStyleProps}
                   style={{
                     height:`100%`,
                     overflow: "clip", // instead of "scroll"
+                    ...metaframeStyleProps?.style,
                   }}
                 />
             )
