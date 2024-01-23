@@ -1,20 +1,25 @@
 import React, {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
 import {
   MetaframeInputMap,
   Metapage,
+  MetapageEventDefinition,
+  MetapageEvents,
   MetapageIFrameRpcClient,
 } from '@metapages/metapage';
 
 import { MetaframeIframe } from './MetaframeIframe.js';
 
+const MetaframeKey = "embed";
+
 const MetaPageTemplate = {
   version: "0.3",
   metaframes: {
-    embed: {
+    [MetaframeKey]: {
       url: "",
     },
   },
@@ -26,18 +31,32 @@ export const MetaframeStandaloneComponent: React.FC<{
   onOutputs?: (outputs: MetaframeInputMap) => void;
   // optional, for debugging
   onMetapageCreation?: (metapage: Metapage) => void;
+  onUrlChange?: (url: string) => void;
   debug?: boolean;
   style?: React.CSSProperties;
-  height?: string;
-}> = ({ url, inputs, onOutputs, onMetapageCreation, debug, height, style }) => {
+  className?: string;
+  classNameWrapper?: string;
+}> = ({
+  url,
+  inputs,
+  onOutputs,
+  onMetapageCreation,
+  debug,
+  style,
+  className,
+  classNameWrapper,
+  onUrlChange,
+}) => {
   const [metaframe, setMetaframe] = useState<
     MetapageIFrameRpcClient | undefined
   >();
 
   const [metapage, setMetapage] = useState<Metapage | undefined>();
+  const onUrlChangeRef = useRef(onUrlChange);
 
   // create the metapage and bind
   useEffect(() => {
+    const disposers: (() => void)[] = [];
     // now actually create the metapage, this also instantiates the iframe objects
     const definition = Object.assign({}, { ...MetaPageTemplate });
     definition.metaframes.embed.url = url;
@@ -48,7 +67,7 @@ export const MetaframeStandaloneComponent: React.FC<{
 
     setMetapage(metapage);
 
-    const metaframe = metapage.getMetaframe("embed");
+    const metaframe = metapage.getMetaframe(MetaframeKey);
     setMetaframe(metaframe);
 
     if (onOutputs) {
@@ -60,8 +79,26 @@ export const MetaframeStandaloneComponent: React.FC<{
       onMetapageCreation(metapage);
     }
 
+    // listen to metapage definition changes
+    // which will happen if the metaframe changes it's own hash params
+    disposers.push(
+      metapage.addListenerReturnDisposer(
+        MetapageEvents.Definition,
+        (e: MetapageEventDefinition) => {
+          const sourceMetaframe = e.definition.metaframes[MetaframeKey];
+          onUrlChangeRef.current?.(sourceMetaframe.url);
+        }
+      )
+    );
+
     return () => {
       metapage.dispose();
+      while (disposers.length > 0) {
+        const disposer = disposers.pop();
+        if (disposer) {
+          disposer();
+        }
+      }
     };
   }, [url, setMetaframe, onOutputs, onMetapageCreation, debug]);
 
@@ -78,5 +115,12 @@ export const MetaframeStandaloneComponent: React.FC<{
     return <p>...</p>;
   }
 
-  return <MetaframeIframe metaframe={metaframe} style={style} height={height} />;
+  return (
+    <MetaframeIframe
+      metaframe={metaframe}
+      style={style}
+      className={className}
+      classNameWrapper={classNameWrapper}
+    />
+  );
 };

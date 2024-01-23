@@ -39,6 +39,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
   onDefinition?: (e: MetapageDefinitionV3) => void;
   onMetapage?: (m: Metapage) => void;
   Wrapper?: ComponentType<any>;
+  onMetapageError?: (e: any) => void;
   ErrorWrapper?: ComponentType<any>;
   debug?: boolean;
   disableEditing?: boolean;
@@ -51,6 +52,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
   disableEditing,
   debug,
   Wrapper,
+  onMetapageError,
   ErrorWrapper,
 }) => {
   const definitionRef = useRef<{
@@ -63,7 +65,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
   const [metapageInternal, setMetapageInternal] = useState<
     Metapage | undefined
   >();
-  const [error, setError] = useState<any | undefined>();
+  const [errorCatastrophic, setErrorCatastrophic] = useState<any | undefined>();
 
   // Make sure incoming definitions are not duplicates of the current definition
   useEffect(() => {
@@ -95,7 +97,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
 
   // create the metapage and bind
   useEffect(() => {
-    setError(undefined);
+    setErrorCatastrophic(undefined);
     if (!definitionInternal) {
       return;
     }
@@ -117,7 +119,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
         metapageNew.setDefinition(definitionInternal);
       } catch (err) {
         setMetapageInternal(undefined);
-        setError(err);
+        setErrorCatastrophic(err);
         return;
       }
 
@@ -133,10 +135,12 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
     onMetapage,
     definitionInternal,
     setMetapageInternal,
-    setError,
+    setErrorCatastrophic,
     debug,
     definitionRef,
   ]);
+
+  
 
   // listeners: metapage events
   useEffect(() => {
@@ -144,9 +148,11 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
       return;
     }
     const disposers: (() => void)[] = [];
-    disposers.push(
-      metapageInternal.addListenerReturnDisposer(MetapageEvents.Error, setError)
-    );
+    if (onMetapageError) {
+      disposers.push(
+        metapageInternal.addListenerReturnDisposer(MetapageEvents.Error, onMetapageError)
+      );
+    }
     if (onOutputs) {
       disposers.push(
         metapageInternal.addListenerReturnDisposer(
@@ -195,7 +201,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
         }
       }
     };
-  }, [metapageInternal, onOutputs, onDefinition, setError]);
+  }, [metapageInternal, onOutputs, onDefinition, onMetapageError]);
 
   // listeners: inputs
   useEffect(() => {
@@ -266,11 +272,11 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
     [onDefinition, definitionInternal]
   );
 
-  if (error) {
+  if (errorCatastrophic) {
     if (ErrorWrapper) {
-      return <ErrorWrapper error={error} />;
+      return <ErrorWrapper error={errorCatastrophic} />;
     } else {
-      return <div>Error: {`${error}`}</div>;
+      return <div>Error: {`${errorCatastrophic}`}</div>;
     }
   }
 
@@ -298,21 +304,22 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
                 <MetaframeIframe
                   key={metaframeId}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
-                  height={`${
-                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
-                  }px`}
+                  className="borderFatSolidGreen"
+                  style={{
+                    height:`100%`,
+                    overflow: "clip", // instead of "scroll"
+                  }}
                 />
               </Wrapper>
             ) : (
-              <div key={metaframeId}>
                 <MetaframeIframe
                   key={metaframeId}
-                  height={`${
-                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
-                  }px`}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
+                  style={{
+                    height:`100%`,
+                    overflow: "clip", // instead of "scroll"
+                  }}
                 />
-              </div>
             )
           )}
     </ResizingGridLayout>

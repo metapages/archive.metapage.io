@@ -198,21 +198,21 @@ export const MetapageGridLayoutFromMetapage: React.FC<{
                 <MetaframeIframe
                   key={metaframeId}
                   metaframe={metapageInternal.getMetaframes()[metaframeId]}
-                  height={`${
-                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
-                  }px`}
+                  style={{
+                    height: `100%`,
+                    overflow: "clip", // instead of "scroll"
+                  }}
                 />
               </Wrapper>
             ) : (
-              <div key={metaframeId}>
-                <MetaframeIframe
-                  key={metaframeId}
-                  height={`${
-                    rowHeight * (layout.find((v) => v.i === metaframeId)?.h || 1)
-                  }px`}
-                  metaframe={metapageInternal.getMetaframes()[metaframeId]}
-                />
-              </div>
+              <MetaframeIframe
+                key={metaframeId}
+                style={{
+                  height: `100%`,
+                  overflow: "clip", // instead of "scroll"
+                }}
+                metaframe={metapageInternal.getMetaframes()[metaframeId]}
+              />
             )
           )}
     </ResizingGridLayout>
