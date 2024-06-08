@@ -79,7 +79,7 @@ export const PanelPasteJson: React.FC = () => {
             url="https://editor.mtfm.io/#?hm=disabled&options=JTdCJTIyYXV0b3NlbmQlMjIlM0F0cnVlJTJDJTIybW9kZSUyMiUzQSUyMmpzb24lMjIlMkMlMjJzYXZlbG9hZGluaGFzaCUyMiUzQWZhbHNlJTJDJTIydGhlbWUlMjIlM0ElMjJsaWdodCUyMiU3RA=="
             inputs={{ text: metapageJsonInEditor }}
             onOutputs={onOutputs}
-            height="80vh"
+            style={{height:"80vh"}}
           />
         )}
       </Box>
