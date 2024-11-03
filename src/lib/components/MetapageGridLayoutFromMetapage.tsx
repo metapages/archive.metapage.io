@@ -10,7 +10,7 @@ import { Layout } from 'react-grid-layout';
 
 import {
   Metapage,
-  MetapageDefinitionV3,
+  MetapageDefinitionV1,
   MetapageEventDefinition,
   MetapageEvents,
   MetapageInstanceInputs,
@@ -30,16 +30,16 @@ export const MetapageGridLayoutFromMetapage: React.FC<{
   metapage?: Metapage;
   inputs?: MetapageInstanceInputs;
   onOutputs?: (outputs: MetapageInstanceInputs) => void;
-  onDefinition?: (e: MetapageDefinitionV3) => void;
+  onDefinition?: (e: MetapageDefinitionV1) => void;
   Wrapper?: ComponentType<any>;
   ErrorWrapper?: ComponentType<any>;
 }> = ({ metapage, inputs, onOutputs, onDefinition, Wrapper, ErrorWrapper }) => {
   const definitionRef = useRef<{
-    definition: MetapageDefinitionV3;
+    definition: MetapageDefinitionV1;
     hash?: string;
   }>();
   const [definitionInternal, setDefinitionInternal] = useState<
-    MetapageDefinitionV3 | undefined
+  MetapageDefinitionV1 | undefined
   >();
   const [metapageInternal, setMetapageInternal] = useState<
     Metapage | undefined
@@ -143,7 +143,7 @@ export const MetapageGridLayoutFromMetapage: React.FC<{
       }
 
       // The passed in definition could be immutable, so we need to clone it
-      const newDefinition: MetapageDefinitionV3 = JSON.parse(
+      const newDefinition: MetapageDefinitionV1 = JSON.parse(
         JSON.stringify(definitionInternal)
       );
       newDefinition.meta = newDefinition.meta || {};

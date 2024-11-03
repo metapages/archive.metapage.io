@@ -2,7 +2,7 @@ import "./style/iframes.css";
 import "./style/app.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { WithMetaframe } from "@metapages/metaframe-hook";
+import { WithMetaframe } from "@metapages/metaframe-react-hook";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { App } from "./App";
 

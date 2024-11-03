@@ -10,7 +10,7 @@
  *  - else show the help
  */
 import { SetHashParamOpts, useHashParam, useHashParamJson } from '@metapages/hash-query';
-import { convertMetapageDefinitionToCurrentVersion, MetapageDefinitionV3 } from '@metapages/metapage';
+import { convertMetapageDefinitionToCurrentVersion, MetapageDefinitionV1, MetapageDefinitionV3 } from '@metapages/metapage';
 import objectHash from 'object-hash';
 import { useEffect, useState } from 'react';
 
@@ -123,7 +123,7 @@ export const metapageDefinitionFromUrl: () => [
 
 const getMetapageDefinitionFromUrl = async (
   url: string
-): Promise<MetapageDefinitionV3 | undefined> => {
+): Promise<MetapageDefinitionV1 | undefined> => {
   if (!url.endsWith(".json")) {
     if (!url.endsWith("/")) {
       url += "/";
@@ -131,8 +131,8 @@ const getMetapageDefinitionFromUrl = async (
     url += "metapage.json";
   }
   const response = await fetch(url, {});
-  let metapageDefinition: MetapageDefinitionV3 = await response.json();
+  let metapageDefinition: any = await response.json();
   metapageDefinition =
-    convertMetapageDefinitionToCurrentVersion(metapageDefinition);
+    await convertMetapageDefinitionToCurrentVersion(metapageDefinition);
   return metapageDefinition;
 };

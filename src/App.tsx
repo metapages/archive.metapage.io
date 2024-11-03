@@ -30,7 +30,7 @@ import {
 import { useHashParamBoolean } from '@metapages/hash-query';
 import {
   Metapage,
-  MetapageDefinitionV3,
+  MetapageDefinitionV1,
 } from '@metapages/metapage';
 
 import { ButtonGotoExternalLink } from './components/ButtonGotoExternalLink';
@@ -45,37 +45,35 @@ import {
 } from './components/OptionsPanel';
 import { PanelHelp } from './components/PanelHelp';
 import { CustomGridItemComponentLabel } from './CustomGridItemComponentLabel';
-import {
-  getPluginTabs,
-  TabData,
-  TabItem,
-} from './hooks/getPluginTabs';
+
 import { metapageDefinitionFromUrl } from './hooks/metapageDefinitionFromUrl';
 import { MetapageGridLayoutFromDefinition } from './lib';
 
+export type TabItem = { label: string; content: JSX.Element };
+export type TabData = TabItem[];
+
 export const App: React.FC = () => {
   const [alert, setAlert] = useState<AlertBlob | undefined>(undefined);
-  const [metapage, setMetapage] = useState<Metapage | undefined>();
+  // const [metapage, setMetapage] = useState<Metapage | undefined>();
   const [metapageDefinition, setMetapageDefinition] =
     metapageDefinitionFromUrl();
-  const pluginTabData = getPluginTabs({ metapage });
   const [finalTabData, setFinalTabData] = useState<TabData>([]);
   const [hideHeader] = useHashParamBoolean(OptionKeyHideHeader);
   const [disableLayoutEdits] = useHashParamBoolean(OptionKeyDisableLayoutEdit);
 
   const onDefinition = useCallback(
-    (m: MetapageDefinitionV3) => {
+    (m: MetapageDefinitionV1) => {
       setMetapageDefinition(m);
     },
     [setMetapageDefinition]
   );
 
-  const onMetapage = useCallback(
-    (m: Metapage) => {
-      setMetapage(m);
-    },
-    [setMetapage]
-  );
+  // const onMetapage = useCallback(
+  //   (m: Metapage) => {
+  //     setMetapage(m);
+  //   },
+  //   [setMetapage]
+  // );
 
   // collate the plugin tabs with the main tabs
   useEffect(() => {
@@ -91,7 +89,7 @@ export const App: React.FC = () => {
                 definition={metapageDefinition}
                 // metapage={metapage}
                 disableEditing={disableLayoutEdits}
-                onMetapage={onMetapage}
+                // onMetapage={onMetapage}
                 onDefinition={onDefinition}
                 // onOutputs={onOutputs as any}
                 Wrapper={CustomGridItemComponentLabel}
@@ -103,9 +101,8 @@ export const App: React.FC = () => {
           <PanelHelp />
         ),
       },
-      ...pluginTabData,
     ]);
-  }, [pluginTabData, metapageDefinition, onDefinition]);
+  }, [metapageDefinition, onDefinition]);
 
   const getAlert = useCallback(() => {
     return alert ? (
@@ -151,9 +148,9 @@ export const App: React.FC = () => {
           {/* <AuthorDisplay /> */}
           <Spacer />
 
-          {pluginTabData.map((tab: TabItem, index: number) => (
+          {/* {pluginTabData.map((tab: TabItem, index: number) => (
             <Tab key={index + 1}>{tab.label}</Tab>
-          ))}
+          ))} */}
           <ButtonGotoExternalLink/>
           <MenuMetapage />
 

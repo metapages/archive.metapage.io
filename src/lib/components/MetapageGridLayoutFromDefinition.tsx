@@ -17,7 +17,7 @@ import GridLayout, {
 
 import {
   Metapage,
-  MetapageDefinitionV3,
+  MetapageDefinitionV1,
   MetapageEventDefinition,
   MetapageEvents,
   MetapageInstanceInputs,
@@ -36,10 +36,10 @@ export const DEFAULT_ROW_HEIGHT = 100;
  * Create a grid layout metapage from a metapage definition
  */
 export const MetapageGridLayoutFromDefinition: React.FC<{
-  definition?: MetapageDefinitionV3;
+  definition?: MetapageDefinitionV1;
   inputs?: MetapageInstanceInputs;
   onOutputs?: (outputs: MetapageInstanceInputs) => void;
-  onDefinition?: (e: MetapageDefinitionV3) => void;
+  onDefinition?: (e: MetapageDefinitionV1) => void;
   onMetapage?: (m: Metapage) => void;
   Wrapper?: ComponentType<any>;
   onMetapageError?: (e: any) => void;
@@ -61,11 +61,11 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
   ErrorWrapper,
 }) => {
   const definitionRef = useRef<{
-    definition: MetapageDefinitionV3;
+    definition: MetapageDefinitionV1;
     hash?: string;
   }>();
   const [definitionInternal, setDefinitionInternal] = useState<
-    MetapageDefinitionV3 | undefined
+  MetapageDefinitionV1 | undefined
   >();
   const [metapageInternal, setMetapageInternal] = useState<
     Metapage | undefined
@@ -181,21 +181,6 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
           }
         )
       );
-
-      // update our definition if a plugin sets it
-      disposers.push(
-        (() => {
-          const listener = (definition: MetapageDefinitionV3) => {
-            // if a plugin modifies the definition, update the hash param that is the source of truth
-            definitionRef.current = { definition };
-            onDefinition(definition);
-          };
-          return metapageInternal.addListenerReturnDisposer(
-            MetapageEvents.DefinitionUpdateRequest,
-            listener
-          );
-        })()
-      );
     }
 
     return () => {
@@ -255,7 +240,7 @@ export const MetapageGridLayoutFromDefinition: React.FC<{
       }
 
       // The passed in definition could be immutable, so we need to clone it
-      const newDefinition: MetapageDefinitionV3 = JSON.parse(
+      const newDefinition: MetapageDefinitionV1 = JSON.parse(
         JSON.stringify(definitionInternal)
       );
       newDefinition.meta = newDefinition.meta || {};
