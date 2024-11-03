@@ -7,6 +7,7 @@ import React, {
 import {
   MetaframeInputMap,
   Metapage,
+  MetapageDefinitionV1,
   MetapageEventDefinition,
   MetapageEvents,
   MetapageIFrameRpcClient,
@@ -16,8 +17,8 @@ import { MetaframeIframe } from './MetaframeIframe.js';
 
 const MetaframeKey = "embed";
 
-const MetaPageTemplate = {
-  version: "0.3",
+const MetaPageTemplate :MetapageDefinitionV1 = {
+  version: "1",
   metaframes: {
     [MetaframeKey]: {
       url: "",
@@ -60,38 +61,44 @@ export const MetaframeStandaloneComponent: React.FC<{
     // now actually create the metapage, this also instantiates the iframe objects
     const definition = Object.assign({}, { ...MetaPageTemplate });
     definition.metaframes.embed.url = url;
-
     const metapage = new Metapage();
     metapage.debug = debug!!;
-    metapage.setDefinition(definition);
+    let cancelled = false;
+    (async () => {
+      await metapage.setDefinition(definition);
+      if (cancelled) {
+        return;
+      }
 
-    setMetapage(metapage);
+      setMetapage(metapage);
 
-    const metaframe = metapage.getMetaframe(MetaframeKey);
-    setMetaframe(metaframe);
+      const metaframe = metapage.getMetaframe(MetaframeKey);
+      setMetaframe(metaframe);
 
-    if (onOutputs) {
-      metaframe.onOutputs(onOutputs);
-    }
+      if (onOutputs) {
+        metaframe.onOutputs(onOutputs);
+      }
 
-    // for debugging
-    if (onMetapageCreation) {
-      onMetapageCreation(metapage);
-    }
+      // for debugging
+      if (onMetapageCreation) {
+        onMetapageCreation(metapage);
+      }
 
-    // listen to metapage definition changes
-    // which will happen if the metaframe changes it's own hash params
-    disposers.push(
-      metapage.addListenerReturnDisposer(
-        MetapageEvents.Definition,
-        (e: MetapageEventDefinition) => {
-          const sourceMetaframe = e.definition.metaframes[MetaframeKey];
-          onUrlChangeRef.current?.(sourceMetaframe.url);
-        }
-      )
-    );
+      // listen to metapage definition changes
+      // which will happen if the metaframe changes it's own hash params
+      disposers.push(
+        metapage.addListenerReturnDisposer(
+          MetapageEvents.Definition,
+          (e: MetapageEventDefinition) => {
+            const sourceMetaframe = e.definition.metaframes[MetaframeKey];
+            onUrlChangeRef.current?.(sourceMetaframe.url);
+          }
+        )
+      );
+    })();
 
     return () => {
+      cancelled = true;
       metapage.dispose();
       while (disposers.length > 0) {
         const disposer = disposers.pop();
