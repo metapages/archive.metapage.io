@@ -1,6 +1,6 @@
 {
   "name": "@metapages/metapage-grid-react",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "repository": {
     "type": "git",
     "url": "https://github.com/metapages/metapage-app"
@@ -37,8 +37,8 @@
     "yup": "^0.32.11"
   },
   "peerDependencies": {
-    "@metapages/metaframe-react-hook": "^1.0.1",
-    "@metapages/metapage": "^1.0.11"
+    "@metapages/metaframe-react-hook": "1.x",
+    "@metapages/metapage": "1.x"
   },
   "devDependencies": {
     "@types/node": "^20.17.4",
