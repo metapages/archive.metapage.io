@@ -39,6 +39,18 @@ export default defineConfig(({ command, mode }) => ({
     sourcemap: true,
     minify: mode === "development" ? false : "esbuild",
     emptyOutDir: DEPLOY_TARGET === "glitch",
+    rollupOptions: {
+      external: [
+        'react',
+        "react-dom",
+        '@metapages/metapage',
+        "@metapages/metaframe-react-hook",
+        "@chakra-ui/icons",
+        "@chakra-ui/react",
+        "@emotion/react",
+        "@emotion/styled",
+      ],
+    },
     lib:
       DEPLOY_TARGET === "lib"
         ? {
