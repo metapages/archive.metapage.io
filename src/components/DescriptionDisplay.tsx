@@ -1,7 +1,5 @@
-import { Box, Center, Text } from '@chakra-ui/react';
-
 import { metapageDefinitionFromUrl } from '../hooks/metapageDefinitionFromUrl';
-import { UrlToIframe } from '../lib/components/UrlToIframe';
+import { UrlToIframe } from './UrlToIframe';
 
 export const DescriptionDisplay: React.FC = () => {
   const [metapageDefinition] = metapageDefinitionFromUrl();

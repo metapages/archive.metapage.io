@@ -44,7 +44,7 @@ export default defineConfig(({ command, mode }) => ({
         'react',
         "react-dom",
         '@metapages/metapage',
-        "@metapages/metaframe-react-hook",
+        "@metapages/metapage-react",
         "@metapages/hash-query",
         "@chakra-ui/icons",
         "@chakra-ui/react",

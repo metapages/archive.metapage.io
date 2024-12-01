@@ -1,5 +1,5 @@
 {
-  "name": "@metapages/metapage-grid-react",
+  "name": "@metapages/metapage-app",
   "version": "0.1.27",
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "@emotion/react": "11.x",
     "@emotion/styled": "11.x",
     "@metapages/hash-query": "^0.4.19",
+    "@metapages/metapage-grid-react": "^0.2.0",
     "@metapages/metapage-react": "^0.1.0",
     "formik": "^2.2.9",
     "framer-motion": "^7.3.6",
@@ -42,7 +43,6 @@
     "@chakra-ui/react": "2.x",
     "@emotion/react": "11.x",
     "@emotion/styled": "11.x",
-    "@metapages/metaframe-react-hook": "1.x",
     "@metapages/metapage": "1.x",
     "react": "18.x",
     "react-dom": "18.x"

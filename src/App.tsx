@@ -47,7 +47,7 @@ import { PanelHelp } from './components/PanelHelp';
 import { CustomGridItemComponentLabel } from './CustomGridItemComponentLabel';
 
 import { metapageDefinitionFromUrl } from './hooks/metapageDefinitionFromUrl';
-import { MetapageGridLayoutFromDefinition } from './lib';
+import { MetapageGridLayoutFromDefinition } from '@metapages/metapage-grid-react';
 
 export type TabItem = { label: string; content: JSX.Element };
 export type TabData = TabItem[];
