@@ -16,7 +16,7 @@ import {
   MetapageInstanceInputs,
 } from '@metapages/metapage';
 
-import { MetaframeIframe } from './MetaframeIframe.js';
+import { MetaframeIframe } from '@metapages/metapage-react';
 import {
   DEFAULT_ROW_HEIGHT,
   ResizingGridLayout,

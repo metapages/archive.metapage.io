@@ -18,7 +18,7 @@ import {
 } from '../hooks/usePasteMetapageDefinition';
 import {
   MetaframeStandaloneComponent,
-} from '../lib/components/MetaframeStandaloneComponent';
+} from '@metapages/metapage-react';
 
 // change this if developing locally the root site to the demo metapages
 const METAPAGES_ORG = "https://metapages.org/";

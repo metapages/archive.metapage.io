@@ -21,30 +21,31 @@
     "serve": "just serve"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.10",
-    "@chakra-ui/react": "^2.5.1",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
+    "@chakra-ui/icons": "2.x",
+    "@chakra-ui/react": "2.x",
+    "@emotion/react": "11.x",
+    "@emotion/styled": "11.x",
     "@metapages/hash-query": "^0.4.19",
+    "@metapages/metapage-react": "^0.1.0",
     "formik": "^2.2.9",
     "framer-motion": "^7.3.6",
     "object-hash": "^3.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "18.x",
+    "react-dom": "18.x",
     "react-grid-layout": "^1.3.4",
     "react-hook-form": "^7.43.5",
     "react-icons": "^4.8.0",
     "yup": "^0.32.11"
   },
   "peerDependencies": {
-    "@metapages/metaframe-react-hook": "1.x",
-    "@metapages/metapage": "1.x",
-    "react": "18.x",
-    "react-dom": "18.x",
     "@chakra-ui/icons": "2.x",
     "@chakra-ui/react": "2.x",
     "@emotion/react": "11.x",
-    "@emotion/styled": "11.x"
+    "@emotion/styled": "11.x",
+    "@metapages/metaframe-react-hook": "1.x",
+    "@metapages/metapage": "1.x",
+    "react": "18.x",
+    "react-dom": "18.x"
   },
   "devDependencies": {
     "@types/node": "^20.17.4",

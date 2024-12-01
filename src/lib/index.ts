@@ -1,7 +1,7 @@
 export {
   MetaframeStandaloneComponent,
-} from './components/MetaframeStandaloneComponent.js';
-export { MetaframeIframe } from './components/MetaframeIframe.js';
+  MetaframeIframe
+} from '@metapages/metapage-react';
 export { MetaframeView } from './components/MetaframeView.js';
 export {
   MetapageGridLayoutFromMetapage,
