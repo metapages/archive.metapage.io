@@ -1,10 +1,11 @@
-# [Metapage](https://metapages.org/) Viewer Application
+# [Metapage](https://metapage.io/) Open Source Viewer
 
-https://app.metapages.org/
+Docs: https://docs.metapage.io/docs/archiving
 
-The website above hosts a metapage application viewer.
 
-You can use the site to run any metapage application.
+This repo hosts the open source viewer for Metapage. Metapages will be always viewable.
+
+You can use the site to view any metapage from a URL, definition, or the public archive.
 
 ## Development
 
