@@ -17,4 +17,6 @@ Requirements for local development:
 
 Command to start local development:
 
-    `just dev`
+```sh
+    just dev
+```
